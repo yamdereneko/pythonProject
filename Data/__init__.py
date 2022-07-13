@@ -1,5 +1,5 @@
 import DataBase
-
+import Price
 
 if __name__ == '__main__':
-    DataBase.Datas()
+    Price.price()
