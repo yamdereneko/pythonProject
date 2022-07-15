@@ -5,7 +5,8 @@ from selenium.webdriver.chrome.options import Options
 
 def Datas():
     try:
-        service = Service(executable_path="chromedriver.exe")
+        service = Service(executable_path="/Users/yandereneko/Downloads/chromedriver")
+
         options = Options()
         options.add_argument('--headless')
         options.add_argument('disable-gpu')
@@ -13,4 +14,4 @@ def Datas():
         driver = webdriver.Chrome(service=service, options=options)
         return driver
     except:
-        print("获取失败")
+        print("Drive获取失败")

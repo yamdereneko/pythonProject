@@ -1,6 +1,8 @@
 import json
+import urllib
 
 import requests
+import urllib3
 
 
 def request_api(**kwargs):
@@ -8,6 +10,7 @@ def request_api(**kwargs):
     url = "https://www.jx3api.com/app/{0}".format(action)
     headers = {'content-type': 'application/json'}
     if action == "daily":
+        urllib3.disable_warnings()
         response = requests.post(url, headers=headers)
     elif action == "demon":
         payload = {
