@@ -1,24 +1,26 @@
+from ctypes import Union
 from enum import Enum
 from fastapi import FastAPI
+from pydantic import BaseModel
 import main
 import uvicorn
 import asyncio
 import ServerDatas
 
 
-class Item(str, Enum):
-    subServer: str = "斗转星移"
-    server = ServerDatas.ServerData[subServer]
-    price = asyncio.run(main.price(server, subServer))
-
-
 app = FastAPI()
-items_db = ServerDatas.ServerDatas
 
-@app.post("/price/{item}")
-async def price_api(item: Item):
-    if item == Item.subServer:
-        return {"大区": item.subServer, "金": item.price}
+
+def prices_api(subServer):
+    server = ServerDatas.ServerData[subServer]
+    price = main.price(server, subServer)
+    return price
+
+
+@app.get("/price/")
+async def price_api(Server: str):
+    price = await prices_api(Server)
+    return {"大区": Server, "金": price}
 
 
 if __name__ == "__main__":
