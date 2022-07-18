@@ -7,8 +7,8 @@ import ServerDatas
 
 
 class Item(str, Enum):
-    server = "电信五区"
-    subServer = "斗转星移"
+    subServer: str = "斗转星移"
+    server = ServerDatas.ServerData[subServer]
     price = asyncio.run(main.price(server, subServer))
 
 
