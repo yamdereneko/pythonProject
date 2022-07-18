@@ -13,7 +13,7 @@ class Item(str, Enum):
 
 
 app = FastAPI()
-
+items_db = ServerDatas.ServerDatas
 
 @app.post("/price/{item}")
 async def price_api(item: Item):
