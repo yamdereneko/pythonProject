@@ -46,21 +46,21 @@ def price():
         print("价格获取失败")
 
 
-def price_server(playwright, Server, Subserver):
+async def price_server(playwright, Server, Subserver):
     try:
-        browser = playwright.chromium.launch(headless=False)
-        context = browser.new_context()
+        browser = await playwright.chromium.launch()
+        context = await browser.new_context()
         # Open new page
-        page = context.new_page()
-        page.goto("https://jx3.seasunwbl.com/buyer?t=coin")
-
-        page.locator("text=" + Server).click()
-        page.locator("text=" + Subserver).click()
-        page.wait_for_timeout(500)
-        prices = page.locator("//*[@id='app']/div/div[3]/div/div[3]/div[2]/div[4]").text_content()
+        page = await context.new_page()
+        await page.goto("https://jx3.seasunwbl.com/buyer?t=coin")
+        # page.locator("text=确定").first.click()
+        await page.locator("text=" + Server).click()
+        await page.locator("text=" + Subserver).click()
+        await page.wait_for_timeout(500)
+        prices = await page.locator("//*[@id='app']/div/div[3]/div/div[3]/div[2]/div[4]").text_content()
         price = str(prices).split("=")[1]
-        context.close()
-        browser.close()
+        await context.close()
+        await browser.close()
         return price
     except:
         print("价格获取失败")

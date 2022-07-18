@@ -7,7 +7,7 @@ import urllib3
 
 def request_api(**kwargs):
     action = kwargs.get("action")
-    url = "https://www.jx3api.com/app/{0}".format(action)
+    url = "https://www.jx3api.com/app/{0}/".format(action)
     headers = {'content-type': 'application/json'}
     if action == "daily":
         urllib3.disable_warnings()
