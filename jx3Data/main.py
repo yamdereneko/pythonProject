@@ -15,5 +15,3 @@ async def role(school):
     async with async_playwright() as playwright:
         role_choose = await Role.role_server(playwright,school)
     return role_choose
-role = asyncio.run(role("蓬莱"))
-print(role)

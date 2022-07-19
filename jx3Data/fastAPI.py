@@ -17,9 +17,11 @@ def prices_api(subServer):
     return price
 
 
-@app.get("/price/")
+@app.post("/price/")
 async def price_api(Server: str):
     price = await prices_api(Server)
+    print(Server)
+    print(price)
     return {"大区": Server, "金": price}
 
 
