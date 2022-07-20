@@ -56,7 +56,7 @@ async def price_server(playwright, Server, Subserver):
         # page.locator("text=确定").first.click()
         await page.locator("text=" + Server).click()
         await page.locator("text=" + Subserver).click()
-        await page.wait_for_timeout(500)
+        await page.wait_for_load_state("networkidle")
         prices = await page.locator("//*[@id='app']/div/div[3]/div/div[3]/div[2]/div[4]").text_content()
         price = str(prices).split("=")[1]
         await context.close()
