@@ -21,6 +21,7 @@ async def role_server(playwright, school):
         await page.click("[aria-label=\"icon\\: search\"] svg")
         await page.wait_for_timeout(2000)
 
+
         dict_role = {}
 
         # 查询成男号的数量
@@ -78,7 +79,7 @@ async def searchBodySize(page, size):
         return sizeCount
     elif int(await page.locator("//*[@id='app']/div/div[3]/div/div[3]/div[4]/ul/li[9]").text_content()) < 10:
         for i in range(11, 2, -1):
-            await page.wait_for_timeout(500)
+            await page.wait_for_timeout(200)
             if not await page.locator("//*[@id='app']/div/div[3]/div/div[3]/div[4]/ul/li["+str(i)+"]").is_visible(timeout=2000):
                 continue
             elif await page.locator("//*[@id='app']/div/div[3]/div/div[3]/div[4]/ul/li["+str(i)+"]").text_content() == "下一页":
@@ -111,7 +112,9 @@ async def role(school):
         role_choose = await role_server(playwright, school)
     return role_choose
 
+print(asyncio.run(role("大侠")))
 print(asyncio.run(role("蓬莱")))
+print(asyncio.run(role("霸刀")))
 time_end = time.time()
 time_sum = time_start - time_end
 print(time_sum)
