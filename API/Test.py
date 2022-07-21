@@ -62,6 +62,7 @@ async def searchBodySize(page, size):
     await page.click("text=查询")
     await page.wait_for_timeout(1000)
     await page.wait_for_load_state('networkidle')
+
     if not await page.locator("//*[@id='app']/div/div[3]/div/div[3]/div[4]/ul/li[9]").is_visible(timeout=2000):
         for i in range(7, 2, -1):
             if await page.locator("//*[@id='app']/div/div[3]/div/div[3]/div[4]/ul/li["+str(i)+"]").is_visible(timeout=2000):
@@ -77,9 +78,10 @@ async def searchBodySize(page, size):
         rows = await page.locator("div.app-web-components-role-item-styles-index-m__roleItem--1R4F8").all_text_contents()
         sizeCount = len(rows)
         return sizeCount
+
     elif int(await page.locator("//*[@id='app']/div/div[3]/div/div[3]/div[4]/ul/li[9]").text_content()) < 10:
         for i in range(11, 2, -1):
-            await page.wait_for_timeout(200)
+            await page.wait_for_timeout(100)
             if not await page.locator("//*[@id='app']/div/div[3]/div/div[3]/div[4]/ul/li["+str(i)+"]").is_visible(timeout=2000):
                 continue
             elif await page.locator("//*[@id='app']/div/div[3]/div/div[3]/div[4]/ul/li["+str(i)+"]").text_content() == "下一页":
@@ -95,6 +97,7 @@ async def searchBodySize(page, size):
                 sizeCount = (int(size_count) - 1) * 10 + len(rows)
                 await page.locator("text=" + size).click()
                 return sizeCount
+
     else:
         await page.wait_for_timeout(200)
         size_count = await page.locator("//*[@id='app']/div/div[3]/div/div[3]/div[4]/ul/li[9]").text_content()
@@ -107,14 +110,16 @@ async def searchBodySize(page, size):
         await page.locator("text=" + size).click()
         return sizeCount
 
+
 async def role(school):
     async with async_playwright() as playwright:
         role_choose = await role_server(playwright, school)
     return role_choose
 
+
 print(asyncio.run(role("大侠")))
-print(asyncio.run(role("蓬莱")))
-print(asyncio.run(role("霸刀")))
+# print(asyncio.run(role("蓬莱")))
+# print(asyncio.run(role("霸刀")))
 time_end = time.time()
 time_sum = time_start - time_end
 print(time_sum)
