@@ -1,3 +1,5 @@
+#!/usr/bin/python
+# -*- coding: UTF-8 -*-
 import uvicorn
 import wanbaolou
 import jx3Data.jxDatas as JX3Data
