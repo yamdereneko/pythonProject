@@ -1,7 +1,10 @@
 #!/usr/bin/python
 # -*- coding: UTF-8 -*-
 import sys
+from ctypes import Union
+
 import uvicorn
+from pydantic import BaseModel
 import wanbaolou
 import jx3Data.jxDatas as JX3Data
 import JJCRecordAPI
@@ -9,7 +12,6 @@ import person_history
 from fastapi import FastAPI, Request, status
 from fastapi.responses import JSONResponse
 from fastapi import FastAPI, HTTPException
-
 
 sys.path.append(r'/home/pycharm_project')
 sys.path.append(r'/home/pycharm_project/API')
@@ -48,8 +50,20 @@ async def unicorn_exception_handler(request: Request, exc: UnicornException):
     )
 
 
+class JJC(BaseModel):
+    Role_name: str
+
+
+# @app.get("/jjc/")
+# async def jjc_record_api(Role_name: str):
+#     jjc_record = await get_jjc_Record(Role_name)
+#     if jjc_record is None:
+#         raise UnicornException(name=Role_name, content="该用户信息不存在")
+#     print(jjc_record)
+#     return {"role_name": Role_name, "msg": "success", "data": jjc_record}
+
 @app.get("/jjc/")
-async def jjc_record_api(Role_name: str):
+async def jjc_record_api(Role_name: str, data: JJC):
     jjc_record = await get_jjc_Record(Role_name)
     if jjc_record is None:
         raise UnicornException(name=Role_name, content="该用户信息不存在")
@@ -66,7 +80,7 @@ async def person_history_api(Role_name: str):
     return {"role_name": Role_name, "msg": "success", "data": person_res}
 
 
-@app.get("/role")
+@app.get("/role/")
 async def role_api(School: str, Shape: str):
     school_dict = JX3Data.school_number
     shape_dict = JX3Data.bodyType

@@ -6,14 +6,16 @@ import requests
 import urllib3
 import pymysql
 import jx3Data.jxDatas as JX3Data
+import datetime
 
 
 async def connect_Mysql(shape, shcool, role_sum):
     try:
         db = pymysql.connect(host="localhost", user="root", password="Qinhao123.", database="farbnamen", charset="utf8")
         cursor = db.cursor()
-        sql = "insert into wanbaolou_number (shape, school, quantity) values (%(shape)s, %(shcool)s, %(role_sum)s);"
-        cursor.execute(sql, {'shape': shape, 'school': shcool, 'role_sum': role_sum})
+        now_time = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        sql = "insert into wanbaolou_number (shape, school, quantity, time) values ('%s', '%s',%s,'%s')" % (shape, shcool, role_sum, now_time)
+        cursor.execute(sql)
         db.commit()
         cursor.fetchall()
         db.close()

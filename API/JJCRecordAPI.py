@@ -13,9 +13,11 @@ import SQLITE
 import requests
 import json
 import jx3Data.jxDatas
+
 # 请求头
 
 headers = jx3Data.jxDatas.headers
+
 
 async def get_xsk(data=None):
     data = json.dumps(data)
