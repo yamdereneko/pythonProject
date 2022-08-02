@@ -1,4 +1,4 @@
-bodyType ={
+bodyType = {
     "成男": 1,
     "成女": 2,
     "正太": 3,
@@ -40,4 +40,29 @@ headers = {
     "token": "02da79f83c4f4da5984519e6c1cb29f9:xiaomianyang1619:kingsoft::qo3e/LCoXnb1XovF7VxHGg==",
     "User-Agent": "SeasunGame/193 CFNetwork/1333.0.4 Darwin/21.5.0",
     "X-Sk": None
+}
+much_school = {
+    "长歌": 4,
+    "唐门": 8,
+    "五毒": 9,
+    "纯阳": 12,
+    "七秀": 14,
+    "万花": 15,
+    "北天药宗": 17
+}
+school_pinyin = {
+    "huajian": "花间",
+    "lijing": "离经",
+    "yunshang": "云裳",
+    "bingxin": "冰心",
+    "wufang": "无方",
+    "lingsu": "灵素",
+    "mowen": "莫问",
+    "xiangzhi": "相知",
+    "tianluo": "田螺",
+    "jingyu": "惊羽",
+    "dujing": "毒经",
+    "butian": "补天",
+    "zixia": "紫霞",
+    "taixu": "胎虚",
 }

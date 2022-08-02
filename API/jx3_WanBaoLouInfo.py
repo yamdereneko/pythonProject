@@ -46,15 +46,15 @@ async def main(size, school, page: int = 1):
     role_sum = man.get("data").get("total_record")
     for role in man.get("data").get("list"):
         # print(role)
-        roles["门派"] = role.get("attrs").get("role_sect")
-        roles["装分"] = role.get("attrs").get("role_equipment_point")
-        roles["资历"] = role.get("attrs").get("role_experience_point")
-        roles["阵营"] = role.get("attrs").get("role_camp")
-        roles["体型"] = role.get("attrs").get("role_shape")
-        roles["价格"] = role.get("single_unit_price") / 100
-        roles["点赞"] = role.get("followed_num")
-        roles["服务器"] = role.get("info").split("-")[1]
-        roles["链接"] = "https://jx3.seasunwbl.com/role?consignment_id=" + role.get("consignment_id")
-        roles_dict.append(roles)
+        # roles["门派"] = role.get("attrs").get("role_sect")
+        # roles["装分"] = role.get("attrs").get("role_equipment_point")
+        # roles["资历"] = role.get("attrs").get("role_experience_point")
+        # roles["阵营"] = role.get("attrs").get("role_camp")
+        # roles["体型"] = role.get("attrs").get("role_shape")
+        # roles["价格"] = role.get("single_unit_price") / 100
+        # roles["点赞"] = role.get("followed_num")
+        # roles["服务器"] = role.get("info").split("-")[1]
+        # roles["链接"] = "https://jx3.seasunwbl.com/role?consignment_id=" + role.get("consignment_id")
+        roles_dict.append(role)
     await connect_Mysql(size, school, role_sum)
     return roles_dict, role_sum

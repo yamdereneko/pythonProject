@@ -9,7 +9,7 @@
 """
 import asyncio
 import sys
-import SQLITE
+import jx3_SearchRoleID
 import requests
 import json
 import jx3Data.jxDatas
@@ -27,7 +27,7 @@ async def get_xsk(data=None):
 
 async def get_server_list(gameName: str):
     # 准备请求参数
-    param = {'gameName':gameName}
+    param = {'gameName': gameName}
     ts, xsk = await get_xsk(param)  # 获取ts和xsk， data 字典可以传ts,不传自动生成
     param['ts'] = ts  # 给参数字典赋值ts参数
     param = json.dumps(param).replace(" ", "")  # 记得格式化，参数需要提交原始json，非已格式化的json
@@ -37,4 +37,5 @@ async def get_server_list(gameName: str):
     print(data)
     return data
 
-asyncio.run(get_server_list('jx3'))
+asyncio.run(get_server_list("jx3"))
+
