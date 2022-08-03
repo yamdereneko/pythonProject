@@ -8,9 +8,10 @@ from pydantic import BaseModel
 import sys
 import uvicorn
 import jx3_WanBaoLouInfo
-import jx3Data.jxDatas as JX3Data
+import creeper.jxDatas as JX3Data
 import jx3_JJCRecord
 import jx3_PersonHistory
+import jx3_GetJJCTopRecord
 import jx3_ServerState
 
 sys.path.append(r'/home/pycharm_project')
@@ -18,6 +19,8 @@ sys.path.append(r'/home/pycharm_project/API')
 
 app = FastAPI()
 
+# ************************************************
+# 定义类型部分
 
 class UnicornException(Exception):
     def __init__(self, name: str, content: str):
@@ -33,6 +36,13 @@ class Transaction(BaseModel):
     Shape: Union[str, None] = None
     School: Union[str, None] = None
 
+
+class JJCWeekly(BaseModel):
+    Week: Union[int, None] = None
+
+
+# ************************************************
+# 代码实现部分 实际代码为异步
 
 def roles(shape, school):
     role = jx3_WanBaoLouInfo.main(shape, school)
@@ -50,6 +60,18 @@ def get_person_history(role_name):
     print(person_history_res)
     return person_history_res
 
+
+def get_JJCTop_Record(week):
+    jjcTopRecord = jx3_GetJJCTopRecord.get_JJCWeeklyRecord(week)
+    print(jjcTopRecord)
+    return jjcTopRecord
+
+def get_ServerState():
+    serverState = jx3_ServerState.get_server_list()
+
+
+# ***************************************
+# 接口部分(以下)
 
 @app.exception_handler(UnicornException)
 async def unicorn_exception_handler(request: Request, exc: UnicornException):
@@ -84,7 +106,7 @@ async def person_history_api(
 
 
 @app.get("/jx3/role")
-async def role_api(
+async def jx3_Role_Api(
         *,
         transaction: Union[Transaction, None] = None
 ):
@@ -100,6 +122,18 @@ async def role_api(
     return {"code": 0, "msg": "success", "school": transaction.School, "shape": transaction.Shape,
             "roles_sum": role_sum,
             "data": roleInfo}
+
+
+@app.get("/jx3/jjcTop")
+async def jjc_TopRecord_api(
+        *,
+        weekly: Union[JJCWeekly, None] = None
+):
+    jjcTopRecord = await get_JJCTop_Record(weekly.Week)
+    if jjcTopRecord is None:
+        raise UnicornException(name=str(weekly.Week), content="该周竞技场信息不存在")
+    print(jjcTopRecord)
+    return {"code": 0, "msg": "success", "weekly": weekly.Week, "data": jjcTopRecord}
 
 
 if __name__ == "__main__":

@@ -12,11 +12,11 @@ import sys
 import jx3_SearchRoleID
 import requests
 import json
-import jx3Data.jxDatas
+import creeper.jxDatas
 
 # 请求头
 
-headers = jx3Data.jxDatas.headers
+headers = creeper.jxDatas.headers
 
 
 async def get_xsk(data=None):
@@ -60,5 +60,3 @@ async def main(role: str):
     data = dataSet.get("data")
     print(data)
     return data
-
-asyncio.run(get_person_history("048d739539374cf4b777bd5dc3c86885"))

@@ -13,7 +13,7 @@ import sys
 import pymysql
 import requests
 import json
-import jx3Data.jxDatas as information
+import creeper.jxDatas as information
 
 # 请求头
 
@@ -71,8 +71,10 @@ async def get_jjc_record(global_role_id: str):
     data = requests.post(url="https://m.pvp.xoyo.com/3c/mine/match/history", data=param, headers=headers).json()
     if data.get("code") != 0:
         print("获取JJC战绩失败，请重试")
+        return None
     if not data.get('data'):
         print("没有JJC战绩，请重试")
+        return None
     return data
 
 
@@ -98,6 +100,11 @@ async def get_top200_history(typeName: str, tag: int, heiMaBang: bool):
                 failure_list.append(element)
                 continue
             jjc_record = await get_jjc_record(global_role_id)
+            if jjc_record is None:
+                print(role_id + " " + school + " " + server + " " + zone + " 战绩不存在")
+                failure_list.append(element)
+                continue
+
             kungfu = jjc_record.get("data")[1].get("kungfu")
             if kungfu in information.school_pinyin:
                 value = information.school_pinyin[kungfu]
@@ -109,7 +116,7 @@ async def get_top200_history(typeName: str, tag: int, heiMaBang: bool):
 
 
 async def main():
-    week = 30
+    week = 26
     data = await get_top200_history('week', week, False)
     sql = "insert into JJC_rank_weekly (week, 霸刀, 藏剑, 蓬莱, 无方,云裳,花间,少林,惊羽,丐帮,苍云,紫霞,相知,补天,凌雪,明教,毒经,灵素,天策,田螺,胎虚,离经,莫问,衍天,冰心) values ('%s','%s','%s',%s,'%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s')" % (week,data["霸刀"], data["藏剑"], data["蓬莱"], data["无方"], data["云裳"], data["花间"], data["少林"], data["惊羽"], data["丐帮"], data["苍云"], data["紫霞"], data["相知"], data["补天"], data["凌雪阁"], data["明教"], data["毒经"], data["灵素"], data["天策"], data["田螺"], data["胎虚"], data["离经"], data["莫问"], data["衍天宗"], data["冰心"])
     await connect_Mysql(sql)
