@@ -11,6 +11,10 @@ import asyncio
 import requests
 import json
 import creeper.jxDatas
+import sys
+
+sys.path.append(r'/home/pycharm_project')
+sys.path.append(r'/home/pycharm_project/API')
 
 # 请求头
 
@@ -37,15 +41,20 @@ async def get_server_list():
     if data.get("code") != 0:
         print("服务器状态有问题")
         return None
-    # for info in data.get("data"):
-    #     server = info.get("mainServer")
-    #     for i in ServerState:
-    #         if server in ServerState.values():
-    #             print("已存在")
-    #         else:
-    #             ServerState["mainServer"] = server
-    #     print(info)
-    print(data)
-    return data
 
-asyncio.run(get_server_list())
+    ServerStates = []
+    for info in data.get("data"):
+        flag = 0
+        ServerState = {}
+        server = info.get("mainServer")
+        for i in ServerStates:
+            if i.get("mainServer") == server:
+                flag = 1
+                break
+        if flag == 1:
+            continue
+        ServerState["mainServer"] = server
+        ServerState["mainZone"] = info.get("mainZone")
+        ServerState["connectState"] = info.get("connectState")
+        ServerStates.append(ServerState)
+    return ServerStates

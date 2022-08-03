@@ -19,6 +19,7 @@ sys.path.append(r'/home/pycharm_project/API')
 
 app = FastAPI()
 
+
 # ************************************************
 # 定义类型部分
 
@@ -66,8 +67,11 @@ def get_JJCTop_Record(week):
     print(jjcTopRecord)
     return jjcTopRecord
 
+
 def get_ServerState():
     serverState = jx3_ServerState.get_server_list()
+    print(serverState)
+    return serverState
 
 
 # ***************************************
@@ -81,6 +85,8 @@ async def unicorn_exception_handler(request: Request, exc: UnicornException):
     )
 
 
+# JJC个人战绩查询
+# 入参 { "Role_name": "笋笋" }
 @app.get("/jx3/jjc")
 async def jjc_record_api(
         *,
@@ -93,6 +99,8 @@ async def jjc_record_api(
     return {"code": 0, "msg": "success", "role_name": role.Role_name, "data": jjc_record}
 
 
+# 推栏个人查询
+# 入参 { "Role_name": "笋笋" }
 @app.get("/jx3/person")
 async def person_history_api(
         *,
@@ -105,6 +113,8 @@ async def person_history_api(
     return {"code": 0, "msg": "success", "role_name": role.Role_name, "data": person_res}
 
 
+# 万宝楼情况查询
+# 入参 { "Shape": "萝莉", School: "蓬莱" }
 @app.get("/jx3/role")
 async def jx3_Role_Api(
         *,
@@ -124,6 +134,8 @@ async def jx3_Role_Api(
             "data": roleInfo}
 
 
+# JJC TOP200查询
+# 入参 { "Week": 30 }
 @app.get("/jx3/jjcTop")
 async def jjc_TopRecord_api(
         *,
@@ -134,6 +146,16 @@ async def jjc_TopRecord_api(
         raise UnicornException(name=str(weekly.Week), content="该周竞技场信息不存在")
     print(jjcTopRecord)
     return {"code": 0, "msg": "success", "weekly": weekly.Week, "data": jjcTopRecord}
+
+
+# 服务器状态查询
+@app.get("/jx3/check")
+async def check_ServerState():
+    Server_State = await get_ServerState()
+    if Server_State is None:
+        raise UnicornException(name="", content="服务器校验有误，请重试")
+    print(Server_State)
+    return {"code": 0, "msg": "success", "data": Server_State}
 
 
 if __name__ == "__main__":

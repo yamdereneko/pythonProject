@@ -50,6 +50,7 @@ much_school = {
     "万花": 15,
     "北天药宗": 17
 }
+
 school_pinyin = {
     "huajian": "花间",
     "lijing": "离经",
