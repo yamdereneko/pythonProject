@@ -1,7 +1,7 @@
 import asyncio
 import sys
 import time
-
+import loguru
 from playwright.async_api import async_playwright
 from playwright.sync_api import sync_playwright
 
