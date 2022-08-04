@@ -8,7 +8,7 @@ from pydantic import BaseModel
 import sys
 import uvicorn
 import jx3_WanBaoLouInfo
-import creeper.jxDatas as JX3Data
+import jxDatas as JX3Data
 import jx3_JJCRecord
 import jx3_PersonHistory
 import jx3_GetJJCTopRecord

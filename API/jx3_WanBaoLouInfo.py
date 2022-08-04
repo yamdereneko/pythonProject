@@ -5,7 +5,7 @@ import sys
 import requests
 import urllib3
 import pymysql
-import creeper.jxDatas as JX3Data
+import jxDatas as JX3Data
 import datetime
 
 

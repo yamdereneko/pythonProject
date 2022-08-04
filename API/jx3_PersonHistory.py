@@ -12,11 +12,11 @@ import sys
 import jx3_SearchRoleID
 import requests
 import json
-import creeper.jxDatas
+import jxDatas as jxData
 
 # 请求头
 
-headers = creeper.jxDatas.headers
+headers = jxData.headers
 
 
 async def get_xsk(data=None):

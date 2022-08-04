@@ -1,2 +1,6 @@
-school = {'霸刀': 4, '藏剑': 4, '蓬莱': 4, '无方': 4, '云裳': 4, '花间': 3, '少林': 1, '惊羽': 1, '丐帮': 3, '苍云': 3, '紫霞': 5, '相知': 2, '补天': 2, '凌雪阁': 1, '明教': 2, '毒经': 2, '灵素': 2, '天策': 1, '田螺': 1, '胎虚': 1}
-print(len(school))
+import API.jxDatas as jxdata
+
+test_dict = {}
+for i in jxdata.all_school.keys():
+    test_dict[i] = 0
+print(test_dict)

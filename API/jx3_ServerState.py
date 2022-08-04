@@ -10,7 +10,7 @@
 import asyncio
 import requests
 import json
-import creeper.jxDatas
+import jxDatas as jxdata
 import sys
 
 sys.path.append(r'/home/pycharm_project')
@@ -18,7 +18,7 @@ sys.path.append(r'/home/pycharm_project/API')
 
 # 请求头
 
-headers = creeper.jxDatas.headers
+headers = jxdata.headers
 
 
 async def get_xsk(data=None):
