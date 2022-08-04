@@ -1,0 +1,20 @@
+{
+  "name": "root",
+  "private": true,
+  "workspaces": [
+    "website"
+  ],
+  "scripts": {
+    "archive": "yarn workspace nonebot docusaurus docs:version",
+    "build": "yarn workspace nonebot build",
+    "build:plugin": "cross-env BASE_URL='/website/' yarn workspace nonebot build",
+    "start": "yarn workspace nonebot start",
+    "serve": "yarn workspace nonebot serve",
+    "clear": "yarn workspace nonebot clear",
+    "prettier": "prettier --config ./.prettierrc --write \"./website/**/*.md\""
+  },
+  "devDependencies": {
+    "cross-env": "^7.0.3",
+    "prettier": "^2.5.0"
+  }
+}

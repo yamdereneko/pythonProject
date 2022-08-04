@@ -1,0 +1,29 @@
+name: NoneBot2 Publish Bot
+
+on:
+  issues:
+    types: [opened, reopened, edited]
+  pull_request_target:
+    types: [closed]
+
+jobs:
+  publish_bot:
+    runs-on: ubuntu-latest
+    name: nonebot2 publish bot
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.GH_TOKEN }}
+
+      - name: NoneBot2 Publish Bot
+        uses: docker://ghcr.io/nonebot/nonebot2-publish-bot:main
+        with:
+          token: ${{ secrets.GH_TOKEN }}
+          config: >
+            {
+              "base": "master",
+              "plugin_path": "website/static/plugins.json",
+              "bot_path": "website/static/bots.json",
+              "adapter_path": "website/static/adapters.json"
+            }
