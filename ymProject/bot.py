@@ -8,9 +8,11 @@ import jx3_JJCRecord as JJCRecord
 import jx3_PersonHistory as PersonHistory
 import jx3_GetJJCTopRecord as GetJJCTopRecord
 import jx3_ServerState as ServerState
-from nonebot.adapters.qqguild import Adapter
+import botpy
+from botpy.message import Message
+from nonebot.adapters.onebot.v11 import Adapter
 from nonebot.log import logger, default_format
-from typing import Union
+from typing import Union, Optional, Tuple
 from fastapi import FastAPI, Request, status
 from fastapi.responses import JSONResponse
 from fastapi import FastAPI, HTTPException
@@ -21,6 +23,9 @@ nonebot.init(_env_file=".env.dev")
 app: FastAPI = nonebot.get_app()
 driver = nonebot.get_driver()
 driver.register_adapter(Adapter)
+
+
+
 
 # Please DO NOT modify this file unless you know what you are doing!
 # As an alternative, you should use command `nb` or modify `pyproject.toml` to load plugins
@@ -75,8 +80,8 @@ def get_person_history(role_name):
     return person_history_res
 
 
-def get_JJCTop_Record(week):
-    jjcTopRecord = GetJJCTopRecord.get_JJCWeeklyRecord(week)
+def get_JJCTop_Record(table, week):
+    jjcTopRecord = GetJJCTopRecord.get_JJCWeeklyRecord(table, week)
     return jjcTopRecord
 
 
@@ -148,16 +153,32 @@ async def jx3_Role_Api(
 
 # JJC TOP200查询
 # 入参 { "Week": 30 }
-@app.get("/jx3/jjcTop")
+@app.get("/jx3/jjcTop200")
 async def jjc_TopRecord_api(
         *,
         weekly: Union[JJCWeekly, None] = None
 ):
-    jjcTopRecord = await get_JJCTop_Record(weekly.Week)
+    table = "JJC_rank_weekly"
+    jjcTopRecord = await get_JJCTop_Record(table, weekly.Week)
     if jjcTopRecord is None:
         raise UnicornException(name=str(weekly.Week), content="该周竞技场信息不存在")
     nonebot.logger.info(jjcTopRecord)
-    return {"code": 0, "msg": "success", "weekly": weekly.Week, "data": jjcTopRecord}
+    return {"code": 0, "msg": "success", "Type": "Top200", "weekly": weekly.Week, "data": jjcTopRecord}
+
+
+# JJC TOP50查询
+# 入参 { "Week": 30 }
+@app.get("/jx3/jjcTop50")
+async def jjc_TopRecord_api(
+        *,
+        weekly: Union[JJCWeekly, None] = None
+):
+    table = "JJC_rank50_weekly"
+    jjcTopRecord = await get_JJCTop_Record(table, weekly.Week)
+    if jjcTopRecord is None:
+        raise UnicornException(name=str(weekly.Week), content="该周竞技场信息不存在")
+    nonebot.logger.info(jjcTopRecord)
+    return {"code": 0, "msg": "success", "Type": "Top50", "weekly": weekly.Week, "data": jjcTopRecord}
 
 
 # 服务器状态查询
@@ -168,6 +189,11 @@ async def check_ServerState():
         raise UnicornException(name="", content="服务器校验有误，请重试")
     nonebot.logger.info(Server_State)
     return {"code": 0, "msg": "success", "data": Server_State}
+
+
+# QQ频道机器人
+# ************************************
+
 
 if __name__ == "__main__":
     nonebot.logger.warning("Always use `nb run` to start the bot instead of manually running!")

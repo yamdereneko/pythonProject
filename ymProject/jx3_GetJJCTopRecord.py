@@ -8,6 +8,7 @@
 import asyncio
 import pymysql
 
+
 # 请求头
 async def connect_Mysql(sql):
     try:
@@ -23,7 +24,7 @@ async def connect_Mysql(sql):
         print("连接数据库异常")
 
 
-async def get_JJCWeeklyRecord(weekly):
-    sql = "select * from JJC_rank_weekly where week='%s'" % weekly
+async def get_JJCWeeklyRecord(table, weekly):
+    sql = "select * from %s where week='%s'" % (table, weekly)
     res = await connect_Mysql(sql)
     return res

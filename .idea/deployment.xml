@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="PublishConfigData" autoUpload="Always" serverName="root@114.115.181.82:22 password" remoteFilesAllowedToDisappearOnAutoupload="false">
+  <component name="PublishConfigData" autoUpload="Always" serverName="root@114.115.181.82:22 password" uploadOnCheckin="c18819ac-a1ee-4d55-817f-978861670c78" remoteFilesAllowedToDisappearOnAutoupload="false">
     <serverData>
       <paths name="root@114.115.181.82:22 password">
         <serverdata>
@@ -10,6 +10,7 @@
         </serverdata>
       </paths>
     </serverData>
+    <option name="myUploadOnCheckinName" value="root@114.115.181.82:22 password" />
     <option name="myAutoUpload" value="ALWAYS" />
   </component>
 </project>
