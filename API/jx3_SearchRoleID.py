@@ -2,7 +2,7 @@ import sqlite3
 
 
 def sqlite(role: str):
-    conn = sqlite3.connect("farbnamen.v4.db")
+    conn = sqlite3.connect("../ymProject/API/farbnamen.v4.db")
     sql = "select * from InfoCache where name=\'{0}\'".format(role)
     cursor = conn.execute(sql)
     role_id = None
