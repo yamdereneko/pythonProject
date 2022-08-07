@@ -1,10 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 import sys
-
-sys.path.append("/home/pycharm_project/ymProject/Data")
-sys.path.append("/home/pycharm_project/ymProject/API")
-
 import nonebot
 from nonebot.adapters.onebot.v11 import Adapter
 from nonebot.log import logger, default_format

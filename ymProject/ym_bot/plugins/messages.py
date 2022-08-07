@@ -35,7 +35,10 @@ async def get_roleJJCInfo(role: str) -> str:
     # params = {'Role_name': role}
     # JJCInfo = httpx.get('https://localhost:8080/jjc', params=params).json()
     data = await jx3API.get_jjc_Record(role)
+    if data is None:
+        await roleJJCRecord.reject(f"你想查询的角色{role}不存在")
     for i in data:
+        match_id = i.get("match_id")
         print(i)
     return f"{data}"
 
