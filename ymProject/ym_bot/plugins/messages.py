@@ -1,13 +1,17 @@
 import asyncio
+import os
 
 from nonebot import on_command
+from nonebot.adapters.onebot.v11 import MessageSegment
 from nonebot.rule import to_me
 from nonebot.matcher import Matcher
 from nonebot.adapters import Message
 from nonebot.params import Arg, CommandArg, ArgPlainText
 import ymProject.API.jx3Main as jx3API
+import ymProject.API.jx3_GetJJCTopRecord as jx3Top100
 
 roleJJCRecord = on_command("roleJJCRecord", rule=to_me(), aliases={"角色", "JJC信息"}, priority=5)
+JJCTop = on_command("JJCTop", rule=to_me(), aliases={"JJC排名"}, priority=5)
 
 
 @roleJJCRecord.handle()
@@ -18,6 +22,15 @@ async def handle_first_receive(matcher: Matcher, args: Message = CommandArg()):
     roleJJCInfo = await get_roleJJCInfo(role=plain_text)
     await roleJJCRecord.finish(roleJJCInfo)
 
+@JJCTop.handle()
+async def handle_second_receive(matcher: Matcher, args: Message = CommandArg()):
+    if args.extract_plain_text() is not None:
+        plain_text = args.extract_plain_text()  # 首次发送命令时跟随的参数，例：/天气 上海，则args为上海
+        await jx3Top100.get_Figure("JJC_rank_weekly", plain_text)
+        msg = MessageSegment.image("file:///home/pycharm_project/ymProject/ym_bot/plugins/top.png")
+        await JJCTop.finish(msg)
+    else:
+        await JJCTop.finish("请求错误")
 
 #
 # @roleJJCRecord.got("role", prompt="你想查询哪个角色信息呢？")
@@ -30,7 +43,7 @@ async def handle_first_receive(matcher: Matcher, args: Message = CommandArg()):
 #     await roleJJCRecord.finish(role_info)
 #
 
-# 在这里编写获取天气信息的函数
+# 在这里编写获取JJC信息的函数
 async def get_roleJJCInfo(role: str) -> str:
     # params = {'Role_name': role}
     # JJCInfo = httpx.get('https://localhost:8080/jjc', params=params).json()
@@ -43,4 +56,3 @@ async def get_roleJJCInfo(role: str) -> str:
     return f"{data}"
 
 
-asyncio.run(get_roleJJCInfo("笋笋"))
