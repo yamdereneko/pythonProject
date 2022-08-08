@@ -18,7 +18,6 @@ nonebot.init(_env_file=".env.dev")
 app: FastAPI = nonebot.get_app()
 
 
-
 class UnicornException(Exception):
     def __init__(self, name: str, content: str):
         self.name = name
@@ -27,6 +26,12 @@ class UnicornException(Exception):
 
 class RoleName(BaseModel):
     Role_name: Union[str, None] = None
+
+
+class personInfo(BaseModel):
+    Role_name: Union[str, None] = None
+    Server: Union[str, None] = None
+    Zone: Union[str, None] = None
 
 
 class Transaction(BaseModel):
@@ -51,8 +56,8 @@ def get_jjc_Record(role_name):
     return role_JJC_Record
 
 
-def get_person_history(role_name):
-    person_history_res = PersonHistory.main(role_name)
+def get_person_history(role_name, server, zone):
+    person_history_res = PersonHistory.main(role_name, server, zone)
     return person_history_res
 
 
@@ -96,13 +101,16 @@ async def jjc_record_api(
 @app.get("/jx3/person")
 async def person_history_api(
         *,
-        role: Union[RoleName, None] = None
+        role: Union[personInfo, None] = None,
+        server: Union[personInfo, None] = None,
+        zone: Union[personInfo, None] = None,
 ):
-    person_res = await get_person_history(role.Role_name)
+    person_res = await get_person_history(role.Role_name, role.Server, role.Zone)
     if person_res is None:
         raise UnicornException(name=role.Role_name, content="该用户信息不存在")
     nonebot.logger.info(person_res)
-    return {"code": 0, "msg": "success", "role_name": role.Role_name, "data": person_res}
+    return {"code": 0, "msg": "success", "role_name": role.Role_name, "server": "role.Server", "zone": "role.Zone",
+            "data": person_res}
 
 
 # 万宝楼情况查询

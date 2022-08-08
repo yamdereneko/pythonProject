@@ -53,6 +53,7 @@ async def get_person_id(role_id: str, server_name: str, zone_name: str):
     headers['X-Sk'] = xsk  # 修改请求中的xsk
     data = requests.post(url="https://m.pvp.xoyo.com/role/indicator", data=param, headers=headers).json()
     person_id = data.get("data").get("person_info").get("person_id")
+    print(person_id)
     return person_id
 
 
@@ -67,17 +68,15 @@ async def get_person_history(person_id: str):
     return data
 
 
-asyncio.run(get_person_history(""))
 
-
-async def main(role: str):
+async def main(role: str, Server: str, Zone: str):
     sql = "select id from InfoCache where name='%s'" % role
     role_id = await connect_Mysql(sql)
     if role_id is None is role_id[0] is None:
         print("获取用户id失败")
         return None
     role_id = role_id[0].get("id")
-    person_id = await get_person_id(str(role_id), "斗转星移", "电信五区")
+    person_id = await get_person_id(str(role_id), Server, Zone)
     dataSet = await get_person_history(person_id)
     data = dataSet.get("data")
     return data

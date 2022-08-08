@@ -9,8 +9,9 @@
 """
 import asyncio
 import sys
-
+import jx3_PersonHistory as jx3Person
 import pymysql
+import pymysql.cursors
 import requests
 import json
 import ymProject.Data.jxDatas as information
@@ -23,11 +24,15 @@ headers = information.headers
 async def connect_Mysql(sql):
     try:
         db = pymysql.connect(host="localhost", user="root", password="Qinhao123.", database="farbnamen", charset="utf8")
-        cursor = db.cursor()
-        cursor.execute(sql)
+        cursor = db.cursor(cursor=pymysql.cursors.DictCursor)
+        res = cursor.execute(sql)
+        if res is None:
+            print("登陆失败")
+            return None
         db.commit()
-        cursor.fetchall()
+        result = cursor.fetchall()
         db.close()
+        return result
     except Exception as e:
         print(e)
         print("连接数据库异常")
@@ -95,12 +100,25 @@ async def get_top200_history(typeName: str, tag: int, heiMaBang: bool):
         school = element.get("personInfo").get("force")
         server = element.get("personInfo").get("server")
         zone = element.get("personInfo").get("zone")
+        name = element.get("personInfo").get("roleName")
         if school in information.much_school:
             global_role_id = await get_global_role_id(role_id, server, zone)
             if global_role_id is None:
-                print(role_id + " " + school + " " + server + " " + zone + " 不存在")
                 failure_list.append(element)
+                print(role_id + " " + school + " " + server + " " + zone + " "+name+" 不存在")
+                person_history = await jx3Person.get_person_history(element.get("personId"))
+                if person_history.get("data") is not None:
+                    continueName = person_history.get("data")[0].get("role_name")
+                    print("continueName:" + continueName)
+                    if name == continueName:
+                        continueKungfu = person_history.get("data")[0].get("kungfu")
+                        value = information.school_pinyin[continueKungfu]
+                        print(value)
+                        school_top[value] = school_top.get(value, 0) + 1
+                        print("重新进行添加："+continueName)
+                        continue
                 continue
+
             jjc_record = await get_jjc_record(global_role_id)
             if jjc_record is None:
                 print(role_id + " " + school + " " + server + " " + zone + " 战绩不存在")
@@ -118,11 +136,11 @@ async def get_top200_history(typeName: str, tag: int, heiMaBang: bool):
 
 
 async def main():
-    week = 31
+    week = 23
     data = await get_top200_history('week', week, False)
+    print(data)
     sql = "insert into JJC_rank_weekly (week, 霸刀, 藏剑, 蓬莱, 无方,云裳,花间,少林,惊羽,丐帮,苍云,紫霞,相知,补天,凌雪,明教,毒经,灵素,天策,田螺,胎虚,离经,莫问,衍天,冰心) values ('%s','%s','%s',%s,'%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s')" % (week,data["霸刀"], data["藏剑"], data["蓬莱"], data["无方"], data["云裳"], data["花间"], data["少林"], data["惊羽"], data["丐帮"], data["苍云"], data["紫霞"], data["相知"], data["补天"], data["凌雪阁"], data["明教"], data["毒经"], data["灵素"], data["天策"], data["田螺"], data["胎虚"], data["离经"], data["莫问"], data["衍天宗"], data["冰心"])
     await connect_Mysql(sql)
-    print(data)
 
 if __name__ == '__main__':
     asyncio.run(main())

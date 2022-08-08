@@ -28,10 +28,10 @@ async def handle_second_receive(matcher: Matcher, args: Message = CommandArg()):
         plain_text = args.extract_plain_text()  # 首次发送命令时跟随的参数，例：/天气 上海，则args为上海
         print(plain_text)
         await jx3Top100.get_Figure("JJC_rank_weekly", plain_text)
-        msg = MessageSegment.image("file:///home/pycharm_project/ymProject/ym_bot/plugins/top.png")
+        msg = MessageSegment.image(f"file:///home/pycharm_project/ymProject/ym_bot/plugins/top{plain_text}.png")
         await JJCTop.finish(msg)
     else:
-        await JJCTop.reject("请求错误")
+        await JJCTop.reject("请求错误,请参考: JJC排名 31")
 #
 # @roleJJCRecord.got("role", prompt="你想查询哪个角色信息呢？")
 # async def handle_city(role: Message = Arg(), roleName: str = ArgPlainText("role")):
