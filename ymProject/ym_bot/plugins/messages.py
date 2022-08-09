@@ -8,18 +8,24 @@ from nonebot.params import Arg, CommandArg, ArgPlainText
 import ymProject.Data.jxDatas as jx3Data
 import ymProject.API.jx3Main as jx3API
 import ymProject.API.jx3_GetJJCTopRecord as jx3Top100
+import ymProject.API.jx3_JJCRecord as JJCRecord
+import ymProject.API.jx3_ServerState as ServerState
+
 
 roleJJCRecord = on_command("roleJJCRecord", rule=to_me(), aliases={"角色", "JJC信息"}, priority=5)
 JJCTop = on_command("JJCTop", rule=to_me(), aliases={"JJC排名"}, priority=5)
+ServerCheck = on_command("ServerCheck", rule=to_me(), aliases={"开服"}, priority=5)
 
 
 @roleJJCRecord.handle()
 async def handle_first_receive(matcher: Matcher, args: Message = CommandArg()):
-    plain_text = args.extract_plain_text()  # 首次发送命令时跟随的参数，例：/天气 上海，则args为上海
-    if plain_text:
-        matcher.set_arg("role", args)
-    roleJJCInfo = await get_roleJJCInfo(role=plain_text)
-    await roleJJCRecord.finish(roleJJCInfo)
+    if args.extract_plain_text() != "":
+        plain_text = args.extract_plain_text()  # 首次发送命令时跟随的参数，例：/天气 上海，则args为上海
+        await JJCRecord.get_figure(plain_text)
+        msg = MessageSegment.image(f"file:///tmp/role{plain_text}.png")
+        await JJCTop.finish(msg)
+    else:
+        await JJCTop.reject("请求错误,请参考: 角色 用户名")
 
 
 @JJCTop.handle()
@@ -35,6 +41,20 @@ async def handle_second_receive(matcher: Matcher, args: Message = CommandArg()):
     else:
         await JJCTop.reject("请求错误,请参考: JJC排名 31或者门派")
 
+@ServerCheck.handle()
+async def handle_second_receive(matcher: Matcher, args: Message = CommandArg()):
+    if args.extract_plain_text() != "":
+        plain_text = args.extract_plain_text()
+        all_serverState = await ServerState.get_server_list()
+        for serverState in all_serverState:
+            if serverState.get("mainServer") == plain_text:
+                state = serverState.get("connectState") is True and plain_text+"已开服" or plain_text+"未开服"
+                await ServerCheck.finish(state)
+        msg = plain_text+"大区信息不对"
+        await ServerCheck.reject(msg)
+    else:
+        msg = await ServerState.get_server_list()
+        await JJCTop.finish(msg)
 
 #
 # @roleJJCRecord.got("role", prompt="你想查询哪个角色信息呢？")
@@ -54,13 +74,13 @@ async def handle_second_receive(matcher: Matcher, args: Message = CommandArg()):
 #
 
 # 在这里编写获取JJC信息的函数
-async def get_roleJJCInfo(role: str) -> str:
-    # params = {'Role_name': role}
-    # JJCInfo = httpx.get('https://localhost:8080/jjc', params=params).json()
-    data = await jx3API.get_jjc_Record(role)
-    if data is None:
-        await roleJJCRecord.reject(f"你想查询的角色{role}不存在")
-    for i in data:
-        match_id = i.get("match_id")
-        print(i)
-    return f"{data}"
+# async def get_roleJJCInfo(role: str) -> str:
+#     # params = {'Role_name': role}
+#     # JJCInfo = httpx.get('https://localhost:8080/jjc', params=params).json()
+#     data = await jx3API.get_jjc_Record(role)
+#     if data is None:
+#         await roleJJCRecord.reject(f"你想查询的角色{role}不存在")
+#     for i in data:
+#         match_id = i.get("match_id")
+#         print(i)
+#     return f"{data}"

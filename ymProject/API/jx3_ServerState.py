@@ -31,8 +31,6 @@ async def get_server_list():
     # 准备请求参数
     gameName = "jx3"
     param = {'gameName': gameName}
-    ServerStates = []
-    ServerState = {}
     ts, xsk = await get_xsk(param)  # 获取ts和xsk， data 字典可以传ts,不传自动生成
     param['ts'] = ts  # 给参数字典赋值ts参数
     param = json.dumps(param).replace(" ", "")  # 记得格式化，参数需要提交原始json，非已格式化的json

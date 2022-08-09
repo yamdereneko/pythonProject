@@ -18,6 +18,7 @@ import pymysql.cursors
 import requests
 import json
 import ymProject.Data.jxDatas as jxDatas
+import dufte
 
 # 请求头
 
@@ -99,9 +100,9 @@ async def main(role: str):
 
 async def get_figure(role: str):
     data = await main(role)
-    fig = plt.figure()
-    ax = fig.add_subplot()
-    ax.set_title(role+'近10场JJC战绩')
+    plt.style.use(dufte.style)
+    fig, ax = plt.subplots(figsize=(8, 9), facecolor='white', edgecolor='white')
+    ax.set_title(role+'近10场JJC战绩', fontsize=14)
     ax.axis([0, 10, 0, 10])
     ax.axis('off')
     for x, y in reversed(list(enumerate(data))):
@@ -114,8 +115,7 @@ async def get_figure(role: str):
         ax.text(0, x, f'{pvp_type}V{pvp_type}    {avg_grade}段     {total_mmr}    {won}   {consume_time}   {start_time}',
                 fontweight='bold'
                 )
-    plt.show()
-
+    plt.savefig(f"/tmp/role{role}.png")
     # Set titles for the figure and the subplot respectively
     # fig.suptitle('bold figure suptitle', fontsize=14, fontweight='bold')
 
@@ -126,23 +126,24 @@ async def get_figure(role: str):
     # Set both x- and y-axis limits to [0, 10] instead of default [0, 1]
 
 
-async def get_plot(role: str):
-    TotalData = await main(role)
-    plt.figure(figsize=(20, 6))
-    plt.title(role+'近10场JJC战绩')
-    jjc_time = []
-    mmr = []
-    # plt.xlabel('周', fontsize=16)
-    # plt.ylabel('数量', fontsize=16)
-    for y in reversed(TotalData):
-        start_time = time.strftime("%H:%M:%S", time.localtime(y.get("start_time")))
-        jjc_time.append(str(start_time))
-        mmr.append(y.get("total_mmr"))
-        plt.text(jjc_time, mmr, '%.0f' % y.get("total_mmr"), ha="center", va="bottom")
-    print(jjc_time)
-    print(mmr)
-    plt.plot(jjc_time, mmr, "o-")
-    plt.show()
+# async def get_plot(role: str):
+#     TotalData = await main(role)
+#     plt.figure()
+#     plt.title(role+'近10场JJC战绩')
+#     jjc_time = []
+#     mmr = []
+#     # plt.xlabel('周', fontsize=16)
+#     # plt.ylabel('数量', fontsize=16)
+#     for y in reversed(TotalData):
+#         start_time = time.strftime("%H:%M:%S", time.localtime(y.get("start_time")))
+#         jjc_time.append(str(start_time))
+#         mmr.append(y.get("total_mmr"))
+#         plt.text(jjc_time, mmr, '%.0f' % y.get("total_mmr"), ha="center", va="bottom")
+#     containsMmr = mmr[0] // 100 * 100
+#     plt.axis([0, 10, containsMmr, containsMmr+100])
+#     plt.grid(True)
+#     plt.plot(jjc_time, mmr, "o-")
+#     plt.show()
 
 
-asyncio.run(get_plot("小疏竹"))
+asyncio.run(get_figure("小疏竹"))
