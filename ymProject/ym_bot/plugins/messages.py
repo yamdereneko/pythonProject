@@ -1,12 +1,11 @@
 import asyncio
-import os
-
 from nonebot import on_command
 from nonebot.adapters.onebot.v11 import MessageSegment
 from nonebot.rule import to_me
 from nonebot.matcher import Matcher
 from nonebot.adapters import Message
 from nonebot.params import Arg, CommandArg, ArgPlainText
+import ymProject.Data.jxDatas as jx3Data
 import ymProject.API.jx3Main as jx3API
 import ymProject.API.jx3_GetJJCTopRecord as jx3Top100
 
@@ -22,16 +21,21 @@ async def handle_first_receive(matcher: Matcher, args: Message = CommandArg()):
     roleJJCInfo = await get_roleJJCInfo(role=plain_text)
     await roleJJCRecord.finish(roleJJCInfo)
 
+
 @JJCTop.handle()
 async def handle_second_receive(matcher: Matcher, args: Message = CommandArg()):
     if args.extract_plain_text() != "":
         plain_text = args.extract_plain_text()  # 首次发送命令时跟随的参数，例：/天气 上海，则args为上海
-        print(plain_text)
-        await jx3Top100.get_Figure("JJC_rank_weekly", plain_text)
-        msg = MessageSegment.image(f"file:///home/pycharm_project/ymProject/ym_bot/plugins/top{plain_text}.png")
+        if args.extract_plain_text() in jx3Data.all_school.keys():
+            await jx3Top100.get_plot("JJC_rank_weekly", plain_text)
+        else:
+            await jx3Top100.get_Figure("JJC_rank_weekly", plain_text)
+        msg = MessageSegment.image(f"file:///tmp/top{plain_text}.png")
         await JJCTop.finish(msg)
     else:
-        await JJCTop.reject("请求错误,请参考: JJC排名 31")
+        await JJCTop.reject("请求错误,请参考: JJC排名 31或者门派")
+
+
 #
 # @roleJJCRecord.got("role", prompt="你想查询哪个角色信息呢？")
 # async def handle_city(role: Message = Arg(), roleName: str = ArgPlainText("role")):
@@ -60,5 +64,3 @@ async def get_roleJJCInfo(role: str) -> str:
         match_id = i.get("match_id")
         print(i)
     return f"{data}"
-
-

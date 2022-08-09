@@ -1,11 +1,12 @@
 import asyncio
-
+import os
 import matplotlib
+import nonebot
 import numpy as np
 import matplotlib.pyplot as plt
-
 import pymysql
 import pymysql.cursors
+
 
 matplotlib.rc("font", family='PingFang HK')
 
@@ -22,6 +23,7 @@ async def connect_Mysql(sql):
     except Exception as e:
         print(e)
         print("连接数据库异常")
+        return None
 
 
 async def get_JJCWeeklyRecord(table, weekly):
@@ -34,15 +36,42 @@ async def get_JJCWeeklyRecord(table, weekly):
     return res_total
 
 
+async def get_JJCWeeklySchoolRecord(table: str, school: str):
+    sql = "select week,%s from %s " % (school, table)
+    res = await connect_Mysql(sql)
+    return res
+
+
 async def get_Figure(table, weekly):
     res = await get_JJCWeeklyRecord(table, weekly)
     if res is None:
         return None
     plt.figure(figsize=(20, 6))
-    plt.title("推栏"+str(weekly) + "周JJC前200排名")
+    plt.title("推栏" + str(weekly) + "周JJC前200排名")
     for x, y in res.items():
         plt.text(x, y, '%.0f' % y, ha="center", va="bottom")
     bar_width = 0.3
     plt.bar(res.keys(), res.values(), width=bar_width)
-    plt.savefig(f"/home/pycharm_project/ymProject/ym_bot/plugins/top{weekly}.png")
+    plt.savefig(f"/tmp/top{weekly}.png")
 
+
+async def get_plot(table,school):
+    if os.path.exists(f"/tmp/top{school}.png"):
+        nonebot.logger.info(school+"JJC趋势图已经存在")
+    else:
+        res = await get_JJCWeeklySchoolRecord(table, school)
+        plt.figure(figsize=(20, 6))
+        plt.title("推栏" + str(school) + "JJC前200趋势图")
+        if res is None:
+            return None
+        x = []
+        y = []
+        plt.xlabel('周', fontsize=16)
+        plt.ylabel('数量', fontsize=16)
+        for data in res:
+            x.append(data["week"])
+            y.append(data[school])
+            plt.text(data["week"], data[school], '%.0f' % data[school], ha="center", va="bottom")
+        plt.plot(x, y, "o-")
+        plt.savefig(f"/tmp/top{school}.png")
+        nonebot.logger.info(school+"JJC趋势图重新创建")

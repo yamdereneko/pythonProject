@@ -7,9 +7,12 @@
 @Time : 2021/09/29 22:39:29
 @Docs : 请求推栏战绩例子
 """
+import time
+from time import gmtime
+import matplotlib
+import matplotlib.pyplot as plt
 import asyncio
 import sys
-
 import pymysql
 import pymysql.cursors
 import requests
@@ -19,6 +22,7 @@ import ymProject.Data.jxDatas as jxDatas
 # 请求头
 
 headers = jxDatas.headers
+matplotlib.rc("font", family='PingFang HK')
 
 
 async def connect_Mysql(sql):
@@ -91,3 +95,54 @@ async def main(role: str):
         return None
     data = dataSet.get("data")
     return data
+
+
+async def get_figure(role: str):
+    data = await main(role)
+    fig = plt.figure()
+    ax = fig.add_subplot()
+    ax.set_title(role+'近10场JJC战绩')
+    ax.axis([0, 10, 0, 10])
+    ax.axis('off')
+    for x, y in reversed(list(enumerate(data))):
+        pvp_type = y.get("pvp_type")
+        avg_grade = y.get("avg_grade")
+        total_mmr = y.get("total_mmr")
+        won = y.get("won") is True and "胜利" or "失败"
+        consume_time = time.strftime("%M分%S秒", gmtime(y.get("end_time") - y.get("start_time")))
+        start_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(y.get("start_time")))
+        ax.text(0, x, f'{pvp_type}V{pvp_type}    {avg_grade}段     {total_mmr}    {won}   {consume_time}   {start_time}',
+                fontweight='bold'
+                )
+    plt.show()
+
+    # Set titles for the figure and the subplot respectively
+    # fig.suptitle('bold figure suptitle', fontsize=14, fontweight='bold')
+
+
+    # ax.set_xlabel('xlabel')
+    # ax.set_ylabel('ylabel')
+
+    # Set both x- and y-axis limits to [0, 10] instead of default [0, 1]
+
+
+async def get_plot(role: str):
+    TotalData = await main(role)
+    plt.figure(figsize=(20, 6))
+    plt.title(role+'近10场JJC战绩')
+    jjc_time = []
+    mmr = []
+    # plt.xlabel('周', fontsize=16)
+    # plt.ylabel('数量', fontsize=16)
+    for y in reversed(TotalData):
+        start_time = time.strftime("%H:%M:%S", time.localtime(y.get("start_time")))
+        jjc_time.append(str(start_time))
+        mmr.append(y.get("total_mmr"))
+        plt.text(jjc_time, mmr, '%.0f' % y.get("total_mmr"), ha="center", va="bottom")
+    print(jjc_time)
+    print(mmr)
+    plt.plot(jjc_time, mmr, "o-")
+    plt.show()
+
+
+asyncio.run(get_plot("小疏竹"))
