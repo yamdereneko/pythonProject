@@ -6,11 +6,9 @@ from nonebot.matcher import Matcher
 from nonebot.adapters import Message
 from nonebot.params import Arg, CommandArg, ArgPlainText
 import ymProject.Data.jxDatas as jx3Data
-import ymProject.API.jx3Main as jx3API
-import ymProject.API.jx3_GetJJCTopRecord as jx3Top100
+import ymProject.API.jx3_GetJJCTopRecord as jx3JJCInfo
 import ymProject.API.jx3_JJCRecord as JJCRecord
 import ymProject.API.jx3_ServerState as ServerState
-
 
 roleJJCRecord = on_command("roleJJCRecord", rule=to_me(), aliases={"角色", "JJC信息"}, priority=5)
 JJCTop = on_command("JJCTop", rule=to_me(), aliases={"JJC排名"}, priority=5)
@@ -32,14 +30,19 @@ async def handle_first_receive(matcher: Matcher, args: Message = CommandArg()):
 async def handle_second_receive(matcher: Matcher, args: Message = CommandArg()):
     if args.extract_plain_text() != "":
         plain_text = args.extract_plain_text()  # 首次发送命令时跟随的参数，例：/天气 上海，则args为上海
-        if args.extract_plain_text() in jx3Data.all_school.keys():
-            await jx3Top100.get_plot("JJC_rank_weekly", plain_text)
+        plain_text = await jx3Data.school(plain_text)
+
+        if plain_text in jx3Data.all_school.keys():
+            jjcInfo = jx3JJCInfo.get_JJCTopInfo("JJC_rank_weekly", 0, plain_text)
+            await jjcInfo.get_JJCWeeklySchoolRecord()
         else:
-            await jx3Top100.get_Figure("JJC_rank_weekly", plain_text)
+            jjcInfo = jx3JJCInfo.get_JJCTopInfo("JJC_rank_weekly", plain_text, "")
+            await jjcInfo.get_JJCWeeklyRecord()
         msg = MessageSegment.image(f"file:///tmp/top{plain_text}.png")
         await JJCTop.finish(msg)
     else:
         await JJCTop.reject("请求错误,请参考: JJC排名 31或者门派")
+
 
 @ServerCheck.handle()
 async def handle_second_receive(matcher: Matcher, args: Message = CommandArg()):
@@ -48,9 +51,9 @@ async def handle_second_receive(matcher: Matcher, args: Message = CommandArg()):
         all_serverState = await ServerState.get_server_list()
         for serverState in all_serverState:
             if serverState.get("mainServer") == plain_text:
-                state = serverState.get("connectState") is True and plain_text+"已开服" or plain_text+"未开服"
+                state = serverState.get("connectState") is True and plain_text + "已开服" or plain_text + "未开服"
                 await ServerCheck.finish(state)
-        msg = plain_text+"大区信息不对"
+        msg = plain_text + "大区信息不对"
         await ServerCheck.reject(msg)
     else:
         msg = await ServerState.get_server_list()

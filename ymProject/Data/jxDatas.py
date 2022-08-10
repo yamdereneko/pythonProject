@@ -1,3 +1,5 @@
+import asyncio
+
 bodyType = {
     "成男": 1,
     "成女": 2,
@@ -71,3 +73,68 @@ school_pinyin = {
 all_school = {'霸刀': 10, '少林': 12, '补天': 12, '蓬莱': 14, '紫霞': 14, '藏剑': 13, '明教': 7, '云裳': 17, '花间': 12, '丐帮': 5,
               '凌雪阁': 8, '田螺': 6, '惊羽': 5, '相知': 14, '胎虚': 5, '苍云': 5, '天策': 8, '无方': 11, '灵素': 6, '冰心': 3, '毒经': 6,
               '衍天宗': 2, '莫问': 1, '离经': 3}
+
+config = {
+    'host': 'localhost',  # 连接主机名。
+    'user': 'root',  # 用户账号
+    'password': 'Qinhao123.',  # 用户密码
+    'db': 'farbnamen',  # 数据库名
+    'port': 3306,  # 连接端口
+    'charset': 'utf8',  # 数据编码
+    'minsize': 12,  # 连接池最小值
+    'maxsize': 96,  # 连接池最大值
+    'autocommit': True,  # 自动提交模式
+}
+
+async def school(method):
+    match method:
+        case "凌雪" | "0雪" | "野猪":
+            return "凌雪阁"
+        case "霸刀" | "刀刀" | "貂貂":
+            return "霸刀"
+        case "和尚" | "灯泡" | "大师":
+            return "少林"
+        case "奶毒" | "毒奶"|"补天决":
+            return "补天"
+        case "蓬莱" | "鸟人" | "雕雕"|"凌海决"|"凌海":
+            return "蓬莱"
+        case "气纯" | "道长" | "咩咩":
+            return "紫霞"
+        case "黄鸡" | "鸡哥" | "山居":
+            return "藏剑"
+        case "喵喵" | "焚影" | "喵哥" | "喵姐":
+            return "明教"
+        case "奶秀" | "秀奶" | "秀人":
+            return "云裳"
+        case "盆栽" | "花间游":
+            return "花间"
+        case "丐狗" | "丐人"|"笑尘":
+            return "丐帮"
+        case "田螺" | "天罗":
+            return "田螺"
+        case "鲸鱼" | "唐门" | "惊羽决":
+            return "惊羽"
+        case "奶歌" | "歌奶" | "奶哥" | "奶鸽" | "鸽奶":
+            return "相知"
+        case "太虚" | "剑纯" | "阿胎" | "阿胎" | "太虚剑意":
+            return "胎虚"
+        case "铁王八"|"王八"|"分山":
+            return "苍云"
+        case "狗策"|"狗人"|"策人":
+            return "天策"
+        case "无方门"|"药毒"|"毒药":
+            return "无方"
+        case "奶药"|"药奶"|"药药":
+            return "灵素"
+        case "冰心决":
+            return "冰心"
+        case "毒人"|"毒毒":
+            return "毒经"
+        case "衍天"|"灯灯":
+            return "衍天宗"
+        case "长歌门"|"莫问决"|"长歌":
+            return "莫问"
+        case "奶花"| "花奶"|"花花"|"离经易道":
+            return "离经"
+        case _:
+            return method

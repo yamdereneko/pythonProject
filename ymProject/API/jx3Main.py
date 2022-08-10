@@ -52,7 +52,7 @@ def roles(shape, school):
 
 
 def get_jjc_Record(role_name):
-    role_JJC_Record = JJCRecord.main(role_name)
+    role_JJC_Record = JJCRecord.get_data(role_name)
     return role_JJC_Record
 
 
@@ -62,7 +62,8 @@ def get_person_history(role_name, server, zone):
 
 
 def get_JJCTop_Record(table, week):
-    jjcTopRecord = GetJJCTopRecord.get_JJCWeeklyRecord(table, week)
+    jjcRecord = GetJJCTopRecord.get_JJCTopInfo(table, week,"")
+    jjcTopRecord = jjcRecord.get_JJCWeeklyRecord()
     return jjcTopRecord
 
 

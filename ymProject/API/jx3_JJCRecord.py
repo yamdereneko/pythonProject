@@ -82,7 +82,7 @@ async def get_jjc_record(global_role_id: str):
     return data
 
 
-async def main(role: str):
+async def get_data(role: str):
     sql = "select id from InfoCache where name='%s'" % role
     role_id = await connect_Mysql(sql)
     if role_id is None is role_id[0] is None:
@@ -99,11 +99,11 @@ async def main(role: str):
 
 
 async def get_figure(role: str):
-    data = await main(role)
+    data = await get_data(role)
     plt.style.use(dufte.style)
     fig, ax = plt.subplots(figsize=(8, 9), facecolor='white', edgecolor='white')
-    ax.set_title(role+'近10场JJC战绩', fontsize=14)
     ax.axis([0, 10, 0, 10])
+    ax.set_title("斗转星移  " + role + '  近10场JJC战绩', fontsize=19, color='#303030', fontweight="heavy",verticalalignment='top')
     ax.axis('off')
     for x, y in reversed(list(enumerate(data))):
         pvp_type = y.get("pvp_type")
@@ -112,18 +112,14 @@ async def get_figure(role: str):
         won = y.get("won") is True and "胜利" or "失败"
         consume_time = time.strftime("%M分%S秒", gmtime(y.get("end_time") - y.get("start_time")))
         start_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(y.get("start_time")))
-        ax.text(0, x, f'{pvp_type}V{pvp_type}    {avg_grade}段     {total_mmr}    {won}   {consume_time}   {start_time}',
-                fontweight='bold'
-                )
+        ax.text(0, x, f'{pvp_type}V{pvp_type}', verticalalignment='bottom', horizontalalignment='left', color='#404040')
+        ax.text(1, x, f'{avg_grade}段局 ', verticalalignment='bottom', horizontalalignment='left', color='#404040')
+        ax.text(2, x, f'{total_mmr}', verticalalignment='bottom', horizontalalignment='left', color='#404040')
+        fontColor = won == "胜利" and 'blue' or 'red'
+        ax.text(3, x, f'{won}', verticalalignment='bottom', horizontalalignment='left', color=fontColor)
+        ax.text(4, x, f'{consume_time}', verticalalignment='bottom', horizontalalignment='left', color='#404040')
+        ax.text(6, x, f'{start_time}', verticalalignment='bottom', horizontalalignment='left', color='#404040')
     plt.savefig(f"/tmp/role{role}.png")
-    # Set titles for the figure and the subplot respectively
-    # fig.suptitle('bold figure suptitle', fontsize=14, fontweight='bold')
-
-
-    # ax.set_xlabel('xlabel')
-    # ax.set_ylabel('ylabel')
-
-    # Set both x- and y-axis limits to [0, 10] instead of default [0, 1]
 
 
 # async def get_plot(role: str):
@@ -145,5 +141,3 @@ async def get_figure(role: str):
 #     plt.plot(jjc_time, mmr, "o-")
 #     plt.show()
 
-
-asyncio.run(get_figure("小疏竹"))
