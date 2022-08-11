@@ -39,7 +39,7 @@ headers = {
     "Host": "m.pvp.xoyo.com",
     "Connection": "Keep-Alive",
     "Accept-Encoding": "gzip",
-    "token": "02da79f83c4f4da5984519e6c1cb29f9:xiaomianyang1619:kingsoft::qo3e/LCoXnb1XovF7VxHGg==",
+    "token": "4a5d3589c0254f7c86b533d61a4a7877:yandereneko:kingsoft::qo3e/LCoXnb1XovF7VxHGg==",
     "User-Agent": "SeasunGame/193 CFNetwork/1333.0.4 Darwin/21.5.0",
     "X-Sk": None
 }
@@ -86,7 +86,8 @@ config = {
     'autocommit': True,  # 自动提交模式
 }
 
-async def school(method):
+
+def school(method):
     match method:
         case "凌雪" | "0雪" | "野猪":
             return "凌雪阁"
@@ -94,9 +95,9 @@ async def school(method):
             return "霸刀"
         case "和尚" | "灯泡" | "大师":
             return "少林"
-        case "奶毒" | "毒奶"|"补天决":
+        case "奶毒" | "毒奶" | "补天决":
             return "补天"
-        case "蓬莱" | "鸟人" | "雕雕"|"凌海决"|"凌海":
+        case "蓬莱" | "鸟人" | "雕雕" | "凌海决" | "凌海":
             return "蓬莱"
         case "气纯" | "道长" | "咩咩":
             return "紫霞"
@@ -108,7 +109,7 @@ async def school(method):
             return "云裳"
         case "盆栽" | "花间游":
             return "花间"
-        case "丐狗" | "丐人"|"笑尘":
+        case "丐狗" | "丐人" | "笑尘":
             return "丐帮"
         case "田螺" | "天罗":
             return "田螺"
@@ -118,23 +119,75 @@ async def school(method):
             return "相知"
         case "太虚" | "剑纯" | "阿胎" | "阿胎" | "太虚剑意":
             return "胎虚"
-        case "铁王八"|"王八"|"分山":
+        case "铁王八" | "王八" | "分山":
             return "苍云"
-        case "狗策"|"狗人"|"策人":
+        case "狗策" | "狗人" | "策人":
             return "天策"
-        case "无方门"|"药毒"|"毒药":
+        case "无方门" | "药毒" | "毒药":
             return "无方"
-        case "奶药"|"药奶"|"药药":
+        case "奶药" | "药奶" | "药药":
             return "灵素"
         case "冰心决":
             return "冰心"
-        case "毒人"|"毒毒":
+        case "毒人" | "毒毒":
             return "毒经"
-        case "衍天"|"灯灯":
+        case "衍天" | "灯灯":
             return "衍天宗"
-        case "长歌门"|"莫问决"|"长歌":
+        case "长歌门" | "莫问决" | "长歌":
             return "莫问"
-        case "奶花"| "花奶"|"花花"|"离经易道":
+        case "奶花" | "花奶" | "花花" | "离经易道":
             return "离经"
+        case _:
+            return method
+
+
+def mainServer(method):
+    match method:
+        case "青梅煮酒" | "青梅":
+            return "青梅煮酒"
+        case "天鹅坪" | "纵月":
+            return "天鹅坪"
+        case "破阵子" | "念破":
+            return "破阵子"
+        case "飞龙在天" | "飞龙":
+            return "飞龙在天"
+        case "长安城" | "长安" | "电一长安":
+            return "长安城"
+        case "龙争虎斗" | "龙虎" | "电一龙虎":
+            return "龙争虎斗"
+        case "蝶恋花" | "蝶服":
+            return "蝶恋花"
+        case "幽月轮" | "六合一" | "七合一":
+            return "幽月轮"
+        case "剑胆琴心" | "煎蛋" | "剑胆":
+            return "剑胆琴心"
+        case "乾坤一掷" | "华乾" | "花钱":
+            return "乾坤一掷"
+        case "斗转星移" | "姨妈" | "大姨妈":
+            return "斗转星移"
+        case "唯我独尊" | "唯满侠" | "鹅服":
+            return "唯我独尊"
+        case "梦江南" | "如梦令" | "双梦":
+            return "梦江南"
+        case "绝代天骄" | "绝代" | "电八":
+            return "绝代天骄"
+        case _:
+            return method
+
+
+def mainZone(method):
+    match method:
+        case "青梅煮酒" | "青梅":
+            return "双线四区"
+        case "天鹅坪" | "纵月" | "破阵子" | "念破":
+            return "双线一区"
+        case "飞龙在天" | "飞龙":
+            return "双线二区"
+        case "长安城" | "长安" | "电一长安" | "龙争虎斗" | "龙虎" | "电一龙虎" | "蝶恋花" | "蝶服":
+            return "电信一区"
+        case "幽月轮" | "六合一" | "七合一" | "剑胆琴心" | "煎蛋" | "剑胆" | "乾坤一掷" | "华乾" | "花钱" | "斗转星移" | "姨妈" | "大姨妈" | "唯我独尊" | "唯满侠" | "鹅服" | "梦江南" | "如梦令" | "双梦":
+            return "电信五区"
+        case "绝代天骄" | "绝代" | "电八":
+            return "电信八区"
         case _:
             return method

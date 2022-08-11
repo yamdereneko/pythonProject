@@ -7,7 +7,7 @@ sys.path.append("/home/pycharm_project/ymProject/Data")
 sys.path.append("/home/pycharm_project/ymProject/API")
 from ymProject.Data import jxDatas as JX3Data
 from ymProject.API import jx3_GetJJCTopRecord as GetJJCTopRecord, jx3_JJCRecord as JJCRecord, \
-    jx3_WanBaoLouInfo as WanBaoLouInfo, jx3_PersonHistory as PersonHistory, jx3_ServerState as ServerState
+    jx3_WanBaoLouInfo as WanBaoLouInfo, jx3_PersonHistory as PersonInfo, jx3_ServerState as ServerState
 from pydantic import BaseModel
 from typing import Union
 import nonebot
@@ -26,12 +26,12 @@ class UnicornException(Exception):
 
 class RoleName(BaseModel):
     Role_name: Union[str, None] = None
+    Server: Union[str, None] = None
 
 
 class personInfo(BaseModel):
     Role_name: Union[str, None] = None
     Server: Union[str, None] = None
-    Zone: Union[str, None] = None
 
 
 class Transaction(BaseModel):
@@ -43,6 +43,10 @@ class JJCWeekly(BaseModel):
     Week: Union[int, None] = None
 
 
+class serverState(BaseModel):
+    Server: Union[str, None] = None
+
+
 # ************************************************
 # 代码实现部分 实际代码为异步
 
@@ -51,25 +55,28 @@ def roles(shape, school):
     return role
 
 
-def get_jjc_Record(role_name):
-    role_JJC_Record = JJCRecord.get_data(role_name)
-    return role_JJC_Record
+def get_jjc_Record(role_name, server):
+    role_JJC_Record = JJCRecord.GetPersonRecord(role_name, server)
+    person_JJC_Record = role_JJC_Record.get_person_record()
+    return person_JJC_Record
 
 
-def get_person_history(role_name, server, zone):
-    person_history_res = PersonHistory.main(role_name, server, zone)
+def get_person_history(role_name, server):
+    person_info = PersonInfo.GetPersonInfo(role_name, server)
+    person_history_res = person_info.main()
     return person_history_res
 
 
 def get_JJCTop_Record(table, week):
-    jjcRecord = GetJJCTopRecord.get_JJCTopInfo(table, week,"")
+    jjcRecord = GetJJCTopRecord.GetJJCTopInfo(table, week, "")
     jjcTopRecord = jjcRecord.get_JJCWeeklyRecord()
     return jjcTopRecord
 
 
-def get_ServerState():
-    serverState = ServerState.get_server_list()
-    return serverState
+def get_ServerState(server=None):
+    State = ServerState.ServerState(server)
+    server_state = State.get_server_list()
+    return server_state
 
 
 # ***************************************
@@ -84,13 +91,13 @@ async def unicorn_exception_handler(request: Request, exc: UnicornException):
 
 
 # JJC个人战绩查询
-# 入参 { "Role_name": "笋笋" }
+# 入参 { "Role_name": "笋笋","Server":"姨妈" }
 @app.get("/jx3/jjc")
 async def jjc_record_api(
         *,
         role: Union[RoleName, None] = None
 ):
-    jjc_record = await get_jjc_Record(role.Role_name)
+    jjc_record = await get_jjc_Record(role.Role_name, role.Server)
     if jjc_record is None:
         raise UnicornException(name=role.Role_name, content="该用户信息不存在")
     nonebot.logger.info(jjc_record)
@@ -103,14 +110,12 @@ async def jjc_record_api(
 async def person_history_api(
         *,
         role: Union[personInfo, None] = None,
-        server: Union[personInfo, None] = None,
-        zone: Union[personInfo, None] = None,
 ):
-    person_res = await get_person_history(role.Role_name, role.Server, role.Zone)
+    person_res = await get_person_history(role.Role_name, role.Server)
     if person_res is None:
         raise UnicornException(name=role.Role_name, content="该用户信息不存在")
     nonebot.logger.info(person_res)
-    return {"code": 0, "msg": "success", "role_name": role.Role_name, "server": "role.Server", "zone": "role.Zone",
+    return {"code": 0, "msg": "success", "role_name": role.Role_name, "server": role.Server,
             "data": person_res}
 
 
@@ -168,9 +173,12 @@ async def jjc_TopRecord_api(
 
 # 服务器状态查询
 @app.get("/jx3/check")
-async def check_ServerState():
-    Server_State = await get_ServerState()
-    if Server_State is None:
-        raise UnicornException(name="", content="服务器校验有误，请重试")
-    nonebot.logger.info(Server_State)
-    return {"code": 0, "msg": "success", "data": Server_State}
+async def check_ServerState(
+        *,
+        SingleServerState: Union[serverState, None] = None
+):
+    serverInfo = get_ServerState()
+    if serverInfo is None:
+        raise UnicornException(name=str(), content="该周竞技场信息不存在")
+    else:
+        return {"code": 0, "msg": "success", "data": serverInfo}

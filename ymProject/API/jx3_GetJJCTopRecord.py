@@ -4,18 +4,19 @@ import matplotlib
 import matplotlib.pyplot as plt
 import nonebot
 import ymProject.Data.jxDatas as jxDatas
-import ymProject.Data.database as Database
+import ymProject.Data.database as database
 import dufte
 
 matplotlib.rc("font", family='PingFang HK')
 
-class get_JJCTopInfo:
+
+class GetJJCTopInfo:
     def __init__(self, table: str, weekly: int, school: str):
         self.table = table
         self.weekly = weekly
         self.school = school
         config = jxDatas.config
-        self.database = Database.DataBase(config)
+        self.database = database.DataBase(config)
 
     # 获取每周每个门派趋势图，返回DICT结果，并打印趋势图至相关目录
     async def get_JJCWeeklyRecord(self):
