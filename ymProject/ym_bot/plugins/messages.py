@@ -1,8 +1,10 @@
 import asyncio
 import re
+
+import nonebot
 from nonebot import on_command
-from nonebot.adapters.onebot.v11 import MessageSegment
-from nonebot.rule import to_me
+from nonebot.adapters.onebot.v11 import MessageSegment,GroupMessageEvent
+from nonebot.rule import to_me, keyword, command
 from nonebot.matcher import Matcher
 from nonebot.adapters import Message
 from nonebot.params import Arg, CommandArg, ArgPlainText
@@ -12,32 +14,39 @@ import ymProject.API.jx3_JJCRecord as JJCRecord
 import ymProject.API.jx3_ServerState as ServerState
 import ymProject.API.jx3_PersonHistory as PersonHistory
 
-RoleJJCRecord = on_command("RoleJJCRecord", rule=to_me(), aliases={"战绩", "JJC信息"}, priority=5)
-JJCTop = on_command("JJCTop", rule=to_me(), aliases={"JJC趋势图"}, priority=5)
-ServerCheck = on_command("ServerCheck", rule=to_me(), aliases={"开服", "区服"}, priority=5)
-PersonInfo = on_command("PersonInfo", rule=to_me(), aliases={"角色"}, priority=5)
+RoleJJCRecord = on_command("RoleJJCRecord", rule=keyword("战绩","JJC信息"),aliases={"战绩","JJC信息"}, priority=5)
+JJCTop = on_command("JJCTop", rule=keyword("JJC趋势图"), aliases={"JJC趋势图"}, priority=5)
+ServerCheck = on_command("ServerCheck", rule=keyword("开服"), aliases={"开服"}, priority=5)
+AllServerState = on_command("AllServerState", rule=keyword("区服"), aliases={"区服"}, priority=5)
+PersonInfo = on_command("PersonInfo", rule=keyword("角色"), aliases={"角色"}, priority=5)
 
 
 @RoleJJCRecord.handle()
-async def handle_first_receive(matcher: Matcher, args: Message = CommandArg()):
+async def onMessage_RoleJJCRecord(matcher: Matcher, args: Message = CommandArg()):
     if args.extract_plain_text() != "":
         plain_text = args.extract_plain_text()  # 首次发送命令时跟随的参数，例：/天气 上海，则args为上海
         plain_text = re.sub(r'[ ]+', ' ', plain_text)
         server = plain_text.split(" ")[0]
         roleName = plain_text.split(" ")[1]
         jjcRecord = JJCRecord.GetPersonRecord(roleName, server)
-        await jjcRecord.get_person_record()
-        msg = MessageSegment.image(f"file:///tmp/role{roleName}.png")
-        await JJCTop.finish(msg)
+        res = await jjcRecord.get_person_record()
+        if res is None:
+            nonebot.logger.error(f"{roleName} JJC战绩查询不存在,请重试")
+            await JJCTop.reject(f"{server} {roleName} JJC战绩查询不存在,请重试")
+        else:
+            msg = MessageSegment.image(f"file:///tmp/role{roleName}.png")
+            await JJCTop.finish(msg)
     else:
         await JJCTop.reject("请求错误,请参考: 战绩 区服 用户名")
 
-
+# 接收 JJC信息
+# JJC排名 31或者门派 ==> 调用存储在/tmp目录下得图片
+# 图片形式发送
 @JJCTop.handle()
-async def handle_second_receive(matcher: Matcher, args: Message = CommandArg()):
+async def onMessage_JJCTop(matcher: Matcher, args: Message = CommandArg()):
     if args.extract_plain_text() != "":
         plain_text = args.extract_plain_text()  # 首次发送命令时跟随的参数，例：/天气 上海，则args为上海
-        plain_text = await jx3Data.school(plain_text)
+        plain_text = jx3Data.school(plain_text)
 
         if plain_text in jx3Data.all_school.keys():
             jjcInfo = jx3JJCInfo.GetJJCTopInfo("JJC_rank_weekly", 0, plain_text)
@@ -48,11 +57,13 @@ async def handle_second_receive(matcher: Matcher, args: Message = CommandArg()):
         msg = MessageSegment.image(f"file:///tmp/top{plain_text}.png")
         await JJCTop.finish(msg)
     else:
-        await JJCTop.reject("请求错误,请参考: JJC排名 31或者门派")
+        await JJCTop.reject("请求错误,请参考: JJC趋势图 31或者门派")
 
-
+# 接收 角色信息 查询本地角色最近游玩的角色的JJC战绩
+# 角色 区服 用户名 ==> 目前的角色JJC战绩
+# 图片形式发送
 @PersonInfo.handle()
-async def handle_third_receive(matcher: Matcher, args: Message = CommandArg()):
+async def onMessage_PersonInfo(matcher: Matcher, args: Message = CommandArg()):
     if args.extract_plain_text() != "":
         plain_text = args.extract_plain_text()  # 首次发送命令时跟随的参数，例：/天气 上海，则args为上海
         plain_text = re.sub(r'[ ]+', ' ', plain_text)
@@ -67,18 +78,35 @@ async def handle_third_receive(matcher: Matcher, args: Message = CommandArg()):
 
 
 @ServerCheck.handle()
-async def handle_forth_receive(matcher: Matcher, args: Message = CommandArg()):
+async def onMessage_ServerCheck(matcher: Matcher, args: Message = CommandArg()):
     if args.extract_plain_text() != "":
-        plain_text = args.extract_plain_text()
+        plain_text = args.extract_plain_text().replace(" ", "")
         all_serverState = ServerState.ServerState(plain_text)
         serverState = await all_serverState.get_server_list()
-        state = serverState is True and plain_text + "已开服" or plain_text + "未开服"
-        await ServerCheck.finish(state)
+        serverName = jx3Data.mainServer(plain_text)
+        for info in serverState:
+            if info.get("mainServer") == serverName:
+                server_state = info.get("connectState")
+                state = server_state is True and serverName + "已开服" or serverName + "未开服"
+                await ServerCheck.finish(state)
+        await ServerCheck.reject("未找到区服,请重新输入")
     else:
-        serverState = ServerState.ServerState()
-        msg = await serverState.get_server_list()
-        await JJCTop.finish(msg)
+        await JJCTop.reject("请求错误,请参考:区服 ")
 
+
+@AllServerState.handle()
+async def onMessage_AllServerState(matcher: Matcher, args: Message = CommandArg()):
+    if args.extract_plain_text() == "":
+        plain_text = args.extract_plain_text()
+        all_serverState = ServerState.ServerState(plain_text)
+        if await all_serverState.get_figure() is True:
+            msg = MessageSegment.image(f"file:///tmp/serverState.png")
+            await AllServerState.finish(msg)
+        else:
+            nonebot.logger.error("全区服图未正常创建，请查看")
+            await ServerCheck.reject("未找到区服,请重新输入")
+    else:
+        await JJCTop.reject("请求错误,请参考:区服")
 
 #
 # @roleJJCRecord.got("role", prompt="你想查询哪个角色信息呢？")

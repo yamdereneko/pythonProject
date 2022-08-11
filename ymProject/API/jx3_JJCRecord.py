@@ -74,8 +74,8 @@ class GetPersonRecord:
         sql = "select id from InfoCache where name='%s'" % self.role
         await self.database.connect()
         role_id_dict = await self.database.fetchone(sql)
-        if len(role_id_dict) == 0:
-            nonebot.logger.info(self.role + "role_id未得到，返回空")
+        if role_id_dict is None:
+            nonebot.logger.error(self.role + "得role_id未得到，将返回None")
             return None
         self.role_id = str(role_id_dict.get("id"))
         await self.get_global_role_id()

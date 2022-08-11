@@ -43,7 +43,7 @@ class JJCWeekly(BaseModel):
     Week: Union[int, None] = None
 
 
-class serverState(BaseModel):
+class ServerStateModel(BaseModel):
     Server: Union[str, None] = None
 
 
@@ -174,11 +174,15 @@ async def jjc_TopRecord_api(
 # 服务器状态查询
 @app.get("/jx3/check")
 async def check_ServerState(
-        *,
-        SingleServerState: Union[serverState, None] = None
+        SingleServerState: ServerStateModel
 ):
-    serverInfo = get_ServerState()
+    serverInfo = await get_ServerState()
     if serverInfo is None:
-        raise UnicornException(name=str(), content="该周竞技场信息不存在")
+        raise UnicornException(name=str(), content="区服信息查询失败")
+
+    if SingleServerState.Server is not None:
+        for info in serverInfo:
+            if info.get("mainServer") == SingleServerState.Server:
+                return {"code": 0, "msg": "success", "data": info}
     else:
         return {"code": 0, "msg": "success", "data": serverInfo}

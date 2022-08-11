@@ -172,7 +172,7 @@ def mainServer(method):
         case "绝代天骄" | "绝代" | "电八":
             return "绝代天骄"
         case _:
-            return method
+            return None
 
 
 def mainZone(method):

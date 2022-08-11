@@ -7,15 +7,14 @@
 @Time : 2021/09/29 22:39:29
 @Docs :
 """
-import asyncio
+import dufte
+import matplotlib
 import requests
 import json
+from matplotlib import pyplot as plt
 import ymProject.Data.jxDatas as jxdata
-import sys
 
-sys.path.append(r'/home/pycharm_project')
-sys.path.append(r'/home/pycharm_project/API')
-
+matplotlib.rc("font", family='PingFang HK')
 # 请求头
 
 headers = jxdata.headers
@@ -50,6 +49,8 @@ class ServerState:
             flag = 0
             ServerState = {}
             server = info.get("mainServer")
+            if jxdata.mainServer(server) is None:
+                break
             for i in ServerStates:
                 if i.get("mainServer") == server:
                     flag = 1
@@ -61,3 +62,24 @@ class ServerState:
             ServerState["connectState"] = info.get("connectState")
             ServerStates.append(ServerState)
         return ServerStates
+
+    async def get_figure(self):
+        data = await self.get_server_list()
+        fig, ax = plt.subplots(figsize=(8, 9), facecolor='white', edgecolor='white')
+        plt.style.use(dufte.style)
+        ax.axis([0, 10, 0, 14])
+        ax.set_title("区服信息", fontsize=19, color='#303030', fontweight="heavy",
+                     verticalalignment='top', )
+        ax.axis('off')
+        for x, y in enumerate(data):
+            mainServer = y.get("mainServer")
+            mainZone = y.get("mainZone")
+            connectState = y.get("connectState")
+            State = connectState is True and "已开服" or "未开服"
+            ax.text(1, x, f'{mainServer}', verticalalignment='bottom', horizontalalignment='left',
+                    color='#404040')
+            ax.text(4, x, f'{mainZone} ', verticalalignment='bottom', horizontalalignment='left', color='#404040')
+            fontColor = State == "已开服" and 'green' or 'red'
+            ax.text(7, x, f'{State}', verticalalignment='bottom', horizontalalignment='left', color=fontColor)
+        plt.savefig(f"/tmp/serverState.png")
+        return True
