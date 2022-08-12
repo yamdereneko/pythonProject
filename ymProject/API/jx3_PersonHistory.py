@@ -56,7 +56,11 @@ class GetPersonInfo:
             param = json.dumps(param).replace(" ", "")  # 记得格式化，参数需要提交原始json，非已格式化的json
             headers['X-Sk'] = self.xsk  # 修改请求中的xsk
             data = requests.post(url="https://m.pvp.xoyo.com/role/indicator", data=param, headers=headers).json()
-            self.person_id = str(data.get("data").get("person_info").get("person_id"))
+            if data.get("data").get("person_info") is not None:
+                self.person_id = str(data.get("data").get("person_info").get("person_id"))
+            else:
+                self.person_id = None
+
         except Exception as e:
             nonebot.logger.error(e)
             nonebot.logger.error("获取Perosn_ID失败，请查看问题.")
@@ -87,14 +91,17 @@ class GetPersonInfo:
             sql = "select id from InfoCache where name='%s'" % self.role
             await self.database.connect()
             role_id_info = await self.database.fetchone(sql)
-            if len(role_id_info) is None:
+            if role_id_info is None:
                 nonebot.logger.error("获取用户id失败")
                 return None
             self.role_id = str(role_id_info.get("id"))
             await self.get_person_id()
             role_info = await self.get_person_history()
-            data = role_info.get("data")
-            return data
+            if role_info is not None:
+                data = role_info.get("data")
+                return data
+            else:
+                return None
         except Exception as e:
             nonebot.logger.error(e)
             nonebot.logger.error("获取用户信息失败，请查看问题.")
@@ -106,7 +113,10 @@ class GetPersonInfo:
             data = await self.main()
             if data is None:
                 nonebot.logger.error("获取用户信息失败，请查看问题.")
-                return "error"
+                return None
+            if not data:
+                nonebot.logger.error("获取用户信息失败，请查看问题.")
+                return None
             server = None
             fig, ax = plt.subplots(figsize=(8, 9), facecolor='white', edgecolor='white')
             plt.style.use(dufte.style)
@@ -138,6 +148,6 @@ class GetPersonInfo:
             return self.role_name
         except Exception as e:
             nonebot.logger.error(e)
-            nonebot.logger.error("获取用户信息失败，请查看问题.")
+            nonebot.logger.error("获取用户信息失败，请查看报错.")
             traceback.print_exc()
-            return "error"
+            return None

@@ -9,15 +9,18 @@
 """
 import dufte
 import matplotlib
+import nonebot
 import requests
 import json
 from matplotlib import pyplot as plt
 import ymProject.Data.jxDatas as jxdata
 
 matplotlib.rc("font", family='PingFang HK')
+headers = jxdata.headers
+
 # 请求头
 
-headers = jxdata.headers
+
 
 
 class ServerState:
@@ -41,7 +44,7 @@ class ServerState:
         data = requests.post(url="https://m.pvp.xoyo.com/msgr-http/get-jx3-server-list", data=param,
                              headers=headers).json()
         if data.get("code") != 0:
-            print("服务器状态有问题")
+            nonebot.logger.error("服务器状态有问题")
             return None
 
         ServerStates = []
@@ -82,4 +85,5 @@ class ServerState:
             fontColor = State == "已开服" and 'green' or 'red'
             ax.text(7, x, f'{State}', verticalalignment='bottom', horizontalalignment='left', color=fontColor)
         plt.savefig(f"/tmp/serverState.png")
+        nonebot.logger.info("区服图已重新构筑")
         return True

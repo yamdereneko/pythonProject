@@ -66,8 +66,10 @@ class GetPersonRecord:
         data = requests.post(url="https://m.pvp.xoyo.com/3c/mine/match/history", data=param, headers=headers).json()
         if data.get("code") != 0:
             nonebot.logger.error("获取JJC战绩失败，请重试")
+            return None
         if not data.get('data'):
             nonebot.logger.error("没有JJC战绩，请重试")
+            return None
         return data
 
     async def get_person_record(self):
@@ -80,6 +82,9 @@ class GetPersonRecord:
         self.role_id = str(role_id_dict.get("id"))
         await self.get_global_role_id()
         dataSet = await self.get_jjc_record()
+        if dataSet is None:
+            nonebot.logger.info(f"没有拿到{self.role}数据")
+            return None
         if dataSet.get("code") != 0:
             nonebot.logger.info(f"没有拿到{self.role}数据")
             return None
