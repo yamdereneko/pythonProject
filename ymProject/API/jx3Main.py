@@ -94,9 +94,10 @@ async def unicorn_exception_handler(request: Request, exc: UnicornException):
 # 入参 { "Role_name": "笋笋","Server":"姨妈" }
 @app.get("/jx3/jjc")
 async def jjc_record_api(
-        *,
         role: Union[RoleName, None] = None
 ):
+    if role is None:
+        raise HTTPException(status_code=500, detail="参数未填，请填入参数，如：{ 'Role_name': '笋笋', 'Server':'姨妈' }")
     jjc_record = await get_jjc_Record(role.Role_name, role.Server)
     if jjc_record is None:
         raise UnicornException(name=role.Role_name, content="该用户信息不存在")
@@ -108,9 +109,10 @@ async def jjc_record_api(
 # 入参 { "Role_name": "笋笋" }
 @app.get("/jx3/person")
 async def person_history_api(
-        *,
         role: Union[personInfo, None] = None,
 ):
+    if role is None:
+        raise HTTPException(status_code=500, detail="参数未填，请填入参数，如：{ 'Role_name': '笋笋' }")
     person_res = await get_person_history(role.Role_name, role.Server)
     if person_res is None:
         raise UnicornException(name=role.Role_name, content="该用户信息不存在")
@@ -123,9 +125,10 @@ async def person_history_api(
 # 入参 { "Shape": "萝莉", School: "蓬莱" }
 @app.get("/jx3/role")
 async def jx3_Role_Api(
-        *,
         transaction: Union[Transaction, None] = None
 ):
+    if transaction is None:
+        raise HTTPException(status_code=500, detail="参数未填，请填入参数，如：{ 'Shape': '萝莉', School: '蓬莱' }")
     school_dict = JX3Data.school_number
     shape_dict = JX3Data.bodyType
     if transaction.School not in school_dict:
@@ -145,9 +148,10 @@ async def jx3_Role_Api(
 # 入参 { "Week": 30 }
 @app.get("/jx3/jjcTop200")
 async def jjc_TopRecord_api(
-        *,
         weekly: Union[JJCWeekly, None] = None
 ):
+    if weekly is None:
+        raise HTTPException(status_code=500, detail="参数未填，请填入参数，如：{ 'Week': 32 }")
     table = "JJC_rank_weekly"
     jjcTopRecord = await get_JJCTop_Record(table, weekly.Week)
     if jjcTopRecord is None:
@@ -160,9 +164,10 @@ async def jjc_TopRecord_api(
 # 入参 { "Week": 30 }
 @app.get("/jx3/jjcTop50")
 async def jjc_TopRecord_api(
-        *,
         weekly: Union[JJCWeekly, None] = None
 ):
+    if weekly is None:
+        raise HTTPException(status_code=500, detail="参数未填，请填入参数，如：{ 'Week': 32 }")
     table = "JJC_rank50_weekly"
     jjcTopRecord = await get_JJCTop_Record(table, weekly.Week)
     if jjcTopRecord is None:
