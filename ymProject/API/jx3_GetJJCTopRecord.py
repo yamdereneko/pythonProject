@@ -3,6 +3,8 @@ import os
 import matplotlib
 import matplotlib.pyplot as plt
 import nonebot
+from matplotlib.ticker import MultipleLocator
+
 import ymProject.Data.jxDatas as jxDatas
 import ymProject.Data.database as database
 import dufte
@@ -27,8 +29,10 @@ class GetJJCTopInfo:
         res_total = dict(tuples)
         del res_total["week"]
         plt.style.use(dufte.style)
-        fig, ax = plt.subplots(figsize=(18, 10), facecolor='white', edgecolor='white')
+
+        fig, ax = plt.subplots(figsize=(22, 10), facecolor='white', edgecolor='white')
         ax.set_title("推栏" + str(self.weekly) + "周JJC前200排名", fontsize=18)
+        ax.yaxis.set_major_locator(MultipleLocator(5))
         for x, y in res_total.items():
             plt.text(x, y, '%.0f' % y, ha="center", va="bottom")
         bar_width = 0.3
@@ -45,7 +49,7 @@ class GetJJCTopInfo:
             nonebot.logger.info(self.school + "JJC趋势图已经存在")
         else:
             plt.style.use(dufte.style)
-            fig, ax = plt.subplots(figsize=(20, 10), facecolor='white', edgecolor='white')
+            fig, ax = plt.subplots(figsize=(22, 10), facecolor='white', edgecolor='white')
             x = []
             y = []
             ax.set_xlabel('周', fontsize=16)

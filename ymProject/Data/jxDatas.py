@@ -39,7 +39,7 @@ headers = {
     "Host": "m.pvp.xoyo.com",
     "Connection": "Keep-Alive",
     "Accept-Encoding": "gzip",
-    "token": "4a5d3589c0254f7c86b533d61a4a7877:yandereneko:kingsoft::qo3e/LCoXnb1XovF7VxHGg==",
+    "token": "fd615d7a9e1341d2a8e56ea692caf857:yandereneko:kingsoft::qo3e/LCoXnb1XovF7VxHGg==",
     "User-Agent": "SeasunGame/193 CFNetwork/1333.0.4 Darwin/21.5.0",
     "X-Sk": None
 }
