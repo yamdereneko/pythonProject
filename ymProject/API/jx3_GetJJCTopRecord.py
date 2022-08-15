@@ -25,9 +25,12 @@ class GetJJCTopInfo:
         sql = "select * from %s where week='%s'" % (self.table, self.weekly)
         await self.database.connect()
         res = await self.database.fetchone(sql)
+        if res is None:
+            return None
         tuples = sorted(res.items(), key=lambda x: x[1], reverse=True)
         res_total = dict(tuples)
         del res_total["week"]
+
         plt.style.use(dufte.style)
 
         fig, ax = plt.subplots(figsize=(22, 10), facecolor='white', edgecolor='white')
@@ -47,6 +50,7 @@ class GetJJCTopInfo:
         res = await self.database.fetchall(sql)
         if os.path.exists(f"/tmp/top{self.school}.png"):
             nonebot.logger.info(self.school + "JJC趋势图已经存在")
+            return None
         else:
             plt.style.use(dufte.style)
             fig, ax = plt.subplots(figsize=(22, 10), facecolor='white', edgecolor='white')

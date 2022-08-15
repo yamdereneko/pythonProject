@@ -138,7 +138,7 @@ def school(method):
         case "奶花" | "花奶" | "花花" | "离经易道":
             return "离经"
         case _:
-            return method
+            return None
 
 
 def mainServer(method):

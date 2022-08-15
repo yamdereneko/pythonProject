@@ -22,10 +22,10 @@ nonebot.load_from_toml("pyproject.toml")
 nonebot.load_plugins("ym_bot/plugins")
 # Custom your logger
 #
-logger.add("error.log",
+logger.add("logs/error.log",
            rotation="00:00",
            diagnose=False,
-           level="ERROR",
+           level="INFO",
            format=default_format)
 
 if __name__ == "__main__":
