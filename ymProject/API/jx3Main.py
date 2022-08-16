@@ -2,19 +2,18 @@
 # -*- coding: utf-8 -*-
 
 import sys
-
-sys.path.append("/home/pycharm_project/ymProject/Data")
-sys.path.append("/home/pycharm_project/ymProject/API")
 from ymProject.Data import jxDatas as JX3Data
 from ymProject.API import jx3_GetJJCTopRecord as GetJJCTopRecord, jx3_JJCRecord as JJCRecord, \
     jx3_WanBaoLouInfo as WanBaoLouInfo, jx3_PersonHistory as PersonInfo, jx3_ServerState as ServerState
+from ymProject.API import jx3_Daily
 from pydantic import BaseModel
 from typing import Union
 import nonebot
 from fastapi.responses import JSONResponse
 from fastapi import FastAPI, HTTPException, Request, status
 
-nonebot.init(_env_file=".env.dev")
+
+nonebot.init(_env_file=".env.dev",apscheduler_autostart=True)
 app: FastAPI = nonebot.get_app()
 
 
@@ -47,6 +46,11 @@ class ServerStateModel(BaseModel):
     Server: Union[str, None] = None
 
 
+class Daily(BaseModel):
+    Server: Union[str, None] = None
+    Next: Union[int, None] = None
+
+
 # ************************************************
 # 代码实现部分 实际代码为异步
 
@@ -77,6 +81,12 @@ def get_ServerState(server=None):
     State = ServerState.ServerState(server)
     server_state = State.get_server_list()
     return server_state
+
+
+def get_Daily(server=None, daily_next=None):
+    daily = jx3_Daily.GetDaily(server, daily_next)
+    daily_info = daily.QueryTodayDaily()
+    return daily_info
 
 
 # ***************************************
@@ -179,15 +189,29 @@ async def jjc_TopRecord_api(
 # 服务器状态查询
 @app.get("/jx3/check")
 async def check_ServerState(
-        SingleServerState: ServerStateModel
+        SingleServerState: Union[ServerStateModel, None] = None
 ):
-    serverInfo = await get_ServerState()
+    if SingleServerState is None:
+        serverInfo = await get_ServerState()
+    else:
+        serverInfo = await get_ServerState(SingleServerState.Server)
+        for info in serverInfo:
+            if info.get("mainServer") == JX3Data.mainServer(SingleServerState.Server):
+                return {"code": 0, "msg": "success", "data": info}
     if serverInfo is None:
         raise UnicornException(name=str(), content="区服信息查询失败")
+    return {"code": 0, "msg": "success", "data": serverInfo}
 
-    if SingleServerState.Server is not None:
-        for info in serverInfo:
-            if info.get("mainServer") == SingleServerState.Server:
-                return {"code": 0, "msg": "success", "data": info}
+
+# 服务器状态查询
+@app.get("/jx3/daily")
+async def daily_api(
+        daily: Daily = None
+):
+    if daily is None:
+        dailyInfo = await get_Daily()
     else:
-        return {"code": 0, "msg": "success", "data": serverInfo}
+        dailyInfo = await get_Daily(daily.Server, daily.Next)
+    if dailyInfo is None:
+        raise UnicornException(name=str(), content="日常查询失败")
+    return {"code": 0, "msg": "success", "data": dailyInfo}
